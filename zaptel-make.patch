@@ -1,0 +1,44 @@
+diff -urN zaptel-1.0.7.org/Makefile zaptel-1.0.7/Makefile
+--- zaptel-1.0.7.org/Makefile	2005-03-01 15:35:16.000000000 +0100
++++ zaptel-1.0.7/Makefile	2005-03-22 23:35:01.745935792 +0100
+@@ -177,8 +177,8 @@
+ ztmonitor: ztmonitor.o
+ 	$(CC) -o ztmonitor ztmonitor.o
+ 
+-ztcat: ztcat.o
+-	$(CC) -o ztcat ztcat.o -ltonezone
++ztcat: ztcat.o $(LIBTONEZONE)
++	$(CC) -o ztcat ztcat.o -L. -ltonezone
+ 
+ ztspeed: ztspeed.o
+ 	$(CC) -o ztspeed ztspeed.o
+@@ -195,15 +195,15 @@
+ $(LIBTONEZONE): $(TZOBJS)
+ 	$(CC) -shared -Wl,-soname,libtonezone.so.1 -lm -o $@ $(TZOBJS)
+ 	[ `id -u` = 0 ] && /sbin/ldconfig || :
+-	ln -sf libtonezone.so.1 libtonezone.so                                  
++	ln -sf $(LIBTONEZONE) libtonezone.so                                  
+ 
+ ztcfg.c: ztcfg.h
+ 
+ ztcfg-shared: ztcfg.o $(LIBTONEZONE)
+ 	$(CC) -o ztcfg-shared ztcfg.o -lm -L. -ltonezone
+ 
+-ztcfg: ztcfg.o libtonezone.a
+-	$(CC) -o ztcfg ztcfg.o -lm -L. libtonezone.a
++ztcfg: ztcfg.o $(LIBTONEZONE)
++	$(CC) -o ztcfg ztcfg.o -lm -L. -ltonezone
+ 
+ ztcfg-dude: ztcfg-dude.o mknotch.o complex.o $(LIBTONEZONE)
+ 	$(CC) -o ztcfg ztcfg-dude.o mknotch.o complex.o -lm -L. -ltonezone
+@@ -220,8 +220,8 @@
+ usbfxstest: usbfxstest.o 
+ 	$(CC) -o usbfxstest usbfxstest.o -lzap
+ 
+-fxstest: fxstest.o 
+-	$(CC) -o fxstest fxstest.o -ltonezone
++fxstest: fxstest.o $(LIBTONEZONE)
++	$(CC) -o fxstest fxstest.o -L. -ltonezone
+ 
+ fxsdump: fxsdump.o
+ 	$(CC) -o fxsdump fxsdump.o -lm
