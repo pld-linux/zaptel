@@ -60,6 +60,7 @@ diagnostyki.
 
 %package init
 Summary:	Zaptel init scripts
+Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
 Requires:	%{name}-utils
 Requires(pre):	sh-utils
@@ -67,7 +68,10 @@ Requires(pre):	/bin/id
 Requires(post,preun):	/sbin/chkconfig
 
 %description init
-Zaptel boot-time initialization
+Zaptel boot-time initialization.
+
+%description init -l pl
+Inicjalizacja Zaptel w czasie startu systemu.
 
 %package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
@@ -198,8 +202,6 @@ if [ "$1" = "0" ]; then
 	fi
 	/sbin/chkconfig --del %{name}
 fi
-
-
 
 %files
 %defattr(644,root,root,755)
