@@ -215,7 +215,7 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
-%{_includedir}/*
+%{_includedir}/linux/*
 
 %files utils
 %defattr(644,root,root,755)
