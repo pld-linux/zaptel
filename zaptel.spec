@@ -169,7 +169,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc README ChangeLog
-%attr(600,root,root) /etc/zaptel.conf
+%attr(600,root,root) %config(noreplace) /etc/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
 
