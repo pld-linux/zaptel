@@ -8,20 +8,17 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	0.9.1
-%define snap	20040830
-%define	_rel	5.%{snap}.1
-Release:	%{_rel}
+Version:	1.0.0
+Release:	1
 License:	GPL
 Group:		Base/Kernel
-#Source0:	ftp://ftp.asterisk.org/pub/telephony/zaptel/%{name}-%{version}.tar.gz
-Source0:	%{name}-%{snap}.tar.gz
-# Source0-md5:	42e27eca2e91895e337a8d1df3ac885e
+Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
+# Source0-md5:	9088735d344cb79bb703a8d73e4ee0d3
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-Makefile.patch
 Patch1:		%{name}-amd64.patch
-URL:		http://www.asteriskpbx.com
+URL:		http://www.asterisk.org
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
@@ -76,7 +73,7 @@ Inicjalizacja Zaptel w czasie startu systemu.
 %package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{release}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
@@ -90,7 +87,7 @@ Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
 %package -n kernel-smp-%{name}
 Summary:	Zaptel Linux SMP kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{release}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
@@ -102,7 +99,7 @@ Zaptel telephony Linux SMP kernel driver.
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
-%setup -q -n %{name}
+%setup -q -n %{name}-%{version}
 %patch0 -p1
 %ifarch amd64
 %patch1 -p1
