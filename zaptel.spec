@@ -10,7 +10,7 @@ Name:		zaptel
 Version:	0.1
 %define	pre 20040407
 %define	_rel 0.%{pre}.1
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	%{name}-%{pre}.tar.gz
