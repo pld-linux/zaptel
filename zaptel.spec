@@ -32,8 +32,8 @@ Sterownik do urz±dzeñ telefonicznych Zaptel.
 %package devel
 Summary:	Zaptel development headers
 Summary(pl):	Pliki nag³ówkowe Zaptel
-Release:	%{_rel}
 Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
 Zaptel development headers.
