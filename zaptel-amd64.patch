@@ -1,0 +1,19 @@
+diff -ur zaptel-0.9.1.orig/Makefile zaptel-0.9.1/Makefile
+--- zaptel-0.9.1.orig/Makefile	2004-08-19 02:24:49.948623984 +0200
++++ zaptel-0.9.1/Makefile	2004-08-19 02:25:27.192961984 +0200
+@@ -263,12 +263,12 @@
+ 		fi; \
+ 	fi
+ 
+-	mkdir -p $(INSTALL_PREFIX)/usr/lib
+-	install -m 755 $(LIBTONEZONE) $(INSTALL_PREFIX)/usr/lib
++	mkdir -p $(INSTALL_PREFIX)/usr/lib64
++	install -m 755 $(LIBTONEZONE) $(INSTALL_PREFIX)/usr/lib64
+ 	install -m 644 zaptel.h $(INSTALL_PREFIX)/usr/include/linux
+ 	install -m 644 torisa.h $(INSTALL_PREFIX)/usr/include/linux
+ 	install -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include
+-	( cd $(INSTALL_PREFIX)/usr/lib ; rm -f libtonezone.so ; ln -sf $(LIBTONEZONE) libtonezone.so )
++	( cd $(INSTALL_PREFIX)/usr/lib64 ; rm -f libtonezone.so ; ln -sf $(LIBTONEZONE) libtonezone.so )
+ 		
+ 	[ -f $(INSTALL_PREFIX)/etc/zaptel.conf ] || install -m 644 zaptel.conf.sample $(INSTALL_PREFIX)/etc/zaptel.conf
+ 

@@ -16,6 +16,7 @@ Group:		Base/Kernel
 Source0:	ftp://ftp.asterisk.org/pub/telephony/zaptel/%{name}-%{version}.tar.gz
 # Source0-md5:	8833bdaf0670b4b5f48e4823887be8d5
 Patch0:		%{name}-Makefile.patch
+Patch1:		%{name}-amd64.patch
 URL:		http://www.asteriskpbx.com
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -84,6 +85,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
