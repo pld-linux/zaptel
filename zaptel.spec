@@ -104,7 +104,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-sed -i -e "s#/usr/lib/#%{_libdir}#g#" Makefile
+sed -i -e "s#/usr/lib#%{_libdir}#g#" Makefile
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
