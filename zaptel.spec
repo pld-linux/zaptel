@@ -9,7 +9,7 @@ Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	0.9.1
-%define	_rel	4
+%define	_rel	5
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
@@ -85,7 +85,9 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %prep
 %setup -q
 %patch0 -p1
+%ifarch amd64
 %patch1 -p1
+%endif
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
