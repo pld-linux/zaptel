@@ -8,17 +8,16 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.0.0
-%define		_rel	2
+Version:	1.0.7
+%define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	9088735d344cb79bb703a8d73e4ee0d3
+# Source0-md5:	d043f54f38b6262ab3cd5599982a7032
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
-Patch0:		%{name}-Makefile.patch
-Patch1:		%{name}-amd64.patch
+Patch0:		%{name}-amd64.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -101,9 +100,8 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
 %setup -q
-%patch0 -p1
 %ifarch amd64
-%patch1 -p1
+%patch0 -p1
 %endif
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
@@ -163,7 +161,8 @@ done
 %if %{with userspace}
 install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir}}
 %{__make} -o all -o devices install \
-	INSTALL_PREFIX=$RPM_BUILD_ROOT
+	INSTALL_PREFIX=$RPM_BUILD_ROOT \
+	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
 install torisatool makefw ztmonitor ztspeed $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
@@ -217,6 +216,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
 %{_includedir}/linux/*
+%{_includedir}/*.h
 
 %files utils
 %defattr(644,root,root,755)
