@@ -226,11 +226,11 @@ fi
 %if %{with kernel}
 %files -n kernel-%{name}
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/misc/*
+/lib/modules/%{_kernel_ver}/misc/*.ko*
 
 %if %{with smp}
 %files -n kernel-smp-%{name}
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/misc/*
+/lib/modules/%{_kernel_ver}smp/misc/*.ko*
 %endif
 %endif
