@@ -70,6 +70,15 @@ Zaptel telephony Linux SMP kernel driver.
 %description -n kernel-smp-%{name} -l pl
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
+%if %{with userspace}
+%package utils
+Summary:	Zaptel utility programs
+Group:	Applications/Communications
+
+%description utils
+Zaptel card utility programs, mainly for diagnostics.
+%endif
+
 %prep
 %setup -q -n %{name}
 %patch0 -p1
@@ -127,9 +136,10 @@ done
 %endif
 
 %if %{with userspace}
-install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc}
+install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc,%{_sbindir}}
 %{__make} -o all -o devices install \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT
+install torisatool makefw ztmonitor ztspeed $RPM_BUILD_ROOT%{_sbindir}
 %endif
 
 %clean
@@ -425,4 +435,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*
 %endif
+%endif
+
+%if %{with userspace}
+%files utils
+%{_sbindir}/*
 %endif
