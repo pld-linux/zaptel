@@ -20,12 +20,14 @@ case "$1" in
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/zaptel ]; then
 		msg_starting zaptel
+		busy
 		for mod in $ZAP_MODULES; do
 			modprobe $mod
 		done
 		/sbin/ztcfg
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/zaptel
+		ok
 	else
 		msg_already_running zaptel
 	fi
@@ -34,11 +36,15 @@ case "$1" in
 	# Stop daemons.
 	if [ -f /var/lock/subsys/zaptel ]; then
 		msg_stopping zaptel
+		busy
 		for mod in $ZAP_MODULES; do
-			rmmod $mod
+			if test x$mod != xzaptel; then
+				rmmod $mod
+			fi
 		done
 		rmmod zaptel
 		rm -f /var/lock/subsys/zaptel >/dev/null 2>&1
+		ok
 	else
 		msg_not_running zaptel
 	fi
