@@ -58,7 +58,7 @@ Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?_with_dist_kernel:%requires_releq_kernel_up}
+%{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel-%{name}
@@ -72,7 +72,7 @@ Summary:	Zaptel Linux SMP kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?_with_dist_kernel:%requires_releq_kernel_smp}
+%{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel-smp-%{name}
@@ -108,7 +108,7 @@ for cfg in %{buildconfigs}; do
 	chmod 700 modules
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
-	ln -sf %{_kernelsrcdir}/include/asm-i386 include/asm #FIXME
+	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm #FIXME
 	touch include/config/MARKER
 	%{__make} -C %{_kernelsrcdir} modules \
 		SUBDIRS=$PWD \
