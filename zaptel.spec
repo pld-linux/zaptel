@@ -9,7 +9,8 @@ Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	1.0.0
-Release:	2
+%define		_rel	2
+Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
@@ -35,7 +36,7 @@ Sterownik do urz±dzeñ telefonicznych Zaptel.
 Summary:	Zaptel development headers
 Summary(pl):	Pliki nag³ówkowe Zaptel
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{version}-%{_rel}
 
 %description devel
 Zaptel development headers.
@@ -59,7 +60,7 @@ diagnostyki.
 Summary:	Zaptel init scripts
 Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
-Requires:	%{name}-utils = %{version}-%{release}
+Requires:	%{name}-utils = %{version}-%{_rel}
 Requires(pre):	sh-utils
 Requires(pre):	/bin/id
 Requires(post,preun):	/sbin/chkconfig
@@ -73,7 +74,7 @@ Inicjalizacja Zaptel w czasie startu systemu.
 %package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
-Release:	%{release}@%{_kernel_ver_str}
+Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
@@ -87,7 +88,7 @@ Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
 %package -n kernel-smp-%{name}
 Summary:	Zaptel Linux SMP kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
-Release:	%{release}@%{_kernel_ver_str}
+Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
