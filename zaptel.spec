@@ -211,7 +211,7 @@ fi
 %files init
 %defattr(644,root,root,755)
 %attr(754,root,root) /etc/rc.d/init.d/*
-/etc/sysconfig/zaptel
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/zaptel
 
 %files devel
 %defattr(644,root,root,755)
