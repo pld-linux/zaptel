@@ -8,14 +8,13 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	0.1
-%define	pre 20040423
-%define	_rel 0.%{pre}.1
+Version:	0.9.1
+%define	_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	%{name}-%{pre}.tar.gz
-# Source0-md5:	68c3ec2bb96a8355f9636c5b6a20075f
+Source0:	ftp://ftp.asterisk.org/pub/telephony/zaptel/%{name}-%{version}.tar.gz
+# Source0-md5:	8833bdaf0670b4b5f48e4823887be8d5
 Patch0:		%{name}-Makefile.patch
 URL:		http://www.asteriskpbx.com
 %if %{with kernel} && %{with dist_kernel}
@@ -83,13 +82,14 @@ Zaptel telephony Linux SMP kernel driver.
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
-%setup -q -n %{name}
+%setup -q
 %patch0 -p1
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
-%{__make} prereq
+%{__make} prereq \
+	CC="%{__cc}"
 
 %if %{with kernel}
 for cfg in %{buildconfigs}; do
