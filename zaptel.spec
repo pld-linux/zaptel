@@ -18,7 +18,7 @@ Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-Makefile.patch
 Patch1:		%{name}-amd64.patch
-URL:		http://www.asterisk.org
+URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
@@ -59,7 +59,7 @@ diagnostyki.
 Summary:	Zaptel init scripts
 Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
-Requires:	%{name}-utils
+Requires:	%{name}-utils = %{version}-%{release}
 Requires(pre):	sh-utils
 Requires(pre):	/bin/id
 Requires(post,preun):	/sbin/chkconfig
@@ -99,7 +99,7 @@ Zaptel telephony Linux SMP kernel driver.
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 %patch0 -p1
 %ifarch amd64
 %patch1 -p1
@@ -215,7 +215,7 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
-/usr/include/*
+%{_includedir}/*
 
 %files utils
 %defattr(644,root,root,755)
