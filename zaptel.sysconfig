@@ -1,0 +1,2 @@
+# Modules to load
+ZAP_MODULES="zaptel wcfxo"
