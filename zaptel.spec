@@ -211,8 +211,9 @@ fi
 %attr(755,root,root) %{_libdir}/*.so.*
 
 %files init
+%defattr(644,root,root,755)
 %attr(744,root,root) /etc/rc.d/init.d/*
-%attr(644,root,root) /etc/sysconfig/zaptel
+/etc/sysconfig/zaptel
 
 %files devel
 %defattr(644,root,root,755)
