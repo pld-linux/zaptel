@@ -73,10 +73,12 @@ for cfg in %{buildconfigs}; do
 	fi
 	rm -rf include
 	install -d include/{linux,config}
+	chmod 000 modules
 	%{__make} -C %{_kernelsrcdir} mrproper \
 		SUBDIRS=$PWD \
 		O=$PWD \
 		%{?with_verbose:V=1}
+	chmod 700 modules
 	install -d include/config
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
@@ -95,11 +97,14 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 install -d $RPM_BUILD_ROOT/{sbin,usr/include/linux,/etc}
 for cfg in %{buildconfigs}; do
-	if [ "$cfg" = "nondist" -o "$cfg" = "up" ]; then
-		cfgdest=''
+	cfgdest=''
+	if [ "$cfg" = "smp" ]; then
+		install modules/$cfg/*.ko \
+			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc/
+	else
+		install modules/$cfg/*.ko \
+			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/
 	fi
-	install modules/$cfg/*.ko \
-		$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfgdest/misc/
 done
 
 %{__make} -o all -o devices install INSTALL_PREFIX=$RPM_BUILD_ROOT
@@ -383,7 +388,7 @@ rm -rf $RPM_BUILD_ROOT
 %dev(c,196,255) %attr(664,root,root) /dev/zap/pseudo
 
 %files devel
-%attr(755,root,root) %{_libdir}/*.so.*
+%attr(755,root,root) %{_libdir}/*.so
 /usr/include/*
 
 %files -n kernel-%{name}
