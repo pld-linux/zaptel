@@ -1,6 +1,6 @@
 diff -ur zaptel-1.0.0.orig/Makefile zaptel-1.0.0/Makefile
---- zaptel-1.0.0.orig/Makefile	2004-07-24 18:03:27.000000000 +0200
-+++ zaptel-1.0.0/Makefile	2004-10-19 19:44:35.265550088 +0200
+--- zaptel-1.0.0.orig/Makefile	2004-10-19 19:50:12.099343568 +0200
++++ zaptel-1.0.0/Makefile	2004-10-19 19:50:34.642916424 +0200
 @@ -273,14 +273,14 @@
  		fi; \
  	fi
@@ -16,6 +16,6 @@ diff -ur zaptel-1.0.0.orig/Makefile zaptel-1.0.0/Makefile
  	install -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include
 -	( cd $(INSTALL_PREFIX)/usr/lib ; rm -f libtonezone.so ; ln -sf $(LIBTONEZONE) libtonezone.so )
 +	( cd $(INSTALL_PREFIX)/usr/lib64 ; rm -f libtonezone.so ; ln -sf $(LIBTONEZONE) libtonezone.so )
- 	/sbin/ldconfig
- 	if [ -f $(MODCONF) ]; then mv -f $(MODCONF) $(MODCONF).bak ; fi
- 	cat $(MODCONF).bak | grep -v "alias char-major-250" | \
+ 		
+ 	[ -f $(INSTALL_PREFIX)/etc/zaptel.conf ] || install -m 644 zaptel.conf.sample $(INSTALL_PREFIX)/etc/zaptel.conf
+ 
