@@ -14,7 +14,7 @@ diff -urN zaptel-1.0.7.org/zonedata.c zaptel-1.0.7/zonedata.c
  		/* STUTTER not specified */
  		{ ZT_TONE_STUTTER, "!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,425" } },
  	},
-+	{ 17, "pl", "Poland", { 1000, 4000 },
++	{ 18, "pl", "Poland", { 1000, 4000 },
 +	{
 +		/* Reference: http://www.itu.int/ITU-T/inr/forms/files/tones-0203.pdf */
 +		{ ZT_TONE_DIALTONE, "425" },
