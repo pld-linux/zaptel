@@ -1,0 +1,34 @@
+diff -urN zaptel-1.0.7.org/zaptel.conf.sample zaptel-1.0.7/zaptel.conf.sample
+--- zaptel-1.0.7.org/zaptel.conf.sample	2004-10-29 19:14:40.000000000 +0200
++++ zaptel-1.0.7/zaptel.conf.sample	2005-03-22 21:15:50.338393464 +0100
+@@ -139,4 +139,5 @@
+ #loadzone=jp
+ #loadzone=sp
+ #loadzone=no
++#loadzone=pl
+ defaultzone=us
+diff -urN zaptel-1.0.7.org/zonedata.c zaptel-1.0.7/zonedata.c
+--- zaptel-1.0.7.org/zonedata.c	2004-07-25 23:07:29.000000000 +0200
++++ zaptel-1.0.7/zonedata.c	2005-03-22 21:16:51.736059600 +0100
+@@ -262,5 +262,21 @@
+ 		/* STUTTER not specified */
+ 		{ ZT_TONE_STUTTER, "!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,425" } },
+ 	},
++	{ 17, "pl", "Poland", { 1000, 4000 },
++	{
++		/* Reference: http://www.itu.int/ITU-T/inr/forms/files/tones-0203.pdf */
++		{ ZT_TONE_DIALTONE, "425" },
++		{ ZT_TONE_BUSY, "425/500,0/500" },
++		{ ZT_TONE_RINGTONE, "425/1000,0/4000" },
++		{ ZT_TONE_CONGESTION, "425/500,0/500" },
++		{ ZT_TONE_CALLWAIT, "425/150,0/150,425/150,0/4000" },
++		/* DIALRECALL - not specified */
++		{ ZT_TONE_DIALRECALL, "!350+440/100,!0/100,!350+440/100,!0/100,!350+440/100,!0/100,350+440" },
++		/* RECORDTONE - not specified */
++		{ ZT_TONE_RECORDTONE, "1400/500,0/15000" },
++		{ ZT_TONE_INFO, "!950/330,!1400/330,!1800/330,!0/1000,!950/330,!1400/330,!1800/330,!0/1000,!950/330,!1400/330,!1800/330,!0/1000" },
++		/* STUTTER not specified */
++		{ ZT_TONE_STUTTER, "!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,!425/100,!0/100,425" } },
++	},
+ 	{ -1 }		
+ };
