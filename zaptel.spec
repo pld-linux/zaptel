@@ -9,13 +9,13 @@ Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	0.1
-%define	pre 20040407
+%define	pre 20040423
 %define	_rel 0.%{pre}.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	%{name}-%{pre}.tar.gz
-# Source0-md5:	b3bf72800cf63295e74f03773e04ee8a
+# Source0-md5:	68c3ec2bb96a8355f9636c5b6a20075f
 Patch0:		%{name}-Makefile.patch
 URL:		http://www.asteriskpbx.com
 %if %{with kernel} && %{with dist_kernel}
@@ -98,16 +98,17 @@ for cfg in %{buildconfigs}; do
 		exit 1
 	fi
 	rm -rf include
-	install -d include/{linux,config}
 	chmod 000 modules
-	%{__make} -C %{_kernelsrcdir} mrproper \
+	install -d include/{linux,config}
+	%{__make} -C %{_kernelsrcdir} clean \
 		SUBDIRS=$PWD \
 		O=$PWD \
 		%{?with_verbose:V=1}
-	chmod 700 modules
 	install -d include/config
+	chmod 700 modules
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
+	ln -sf %{_kernelsrcdir}/include/asm-i386 include/asm #FIXME
 	touch include/config/MARKER
 	%{__make} -C %{_kernelsrcdir} modules \
 		SUBDIRS=$PWD \
