@@ -1,11 +1,12 @@
 #
 # Conditional build:
-# _without_dist_kernel          without distribution kernel
+%bcond_without	dist_kernel	# without distribution kernel
+%bcond_without	kernel		# don't build kernel modules
+%bcond_without	smp		# don't build SMP module
+%bcond_without	userspace	# don't build userspace tools
 #
-%bcond_without	dist_kernel
-%bcond_without	smp
-
 Summary:	Zaptel telephony device support
+Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	0.1
 %define	pre 20040407
@@ -15,46 +16,59 @@ License:	GPL
 Group:		Base/Kernel
 Source0:	%{name}-%{pre}.tar.gz
 # Source0-md5:	b3bf72800cf63295e74f03773e04ee8a
-Patch0:	%{name}-Makefile.patch
+Patch0:		%{name}-Makefile.patch
 URL:		http://www.asteriskpbx.com
-%{?with_dist_kernel:BuildRequires:	kernel-headers }
+%if %{with kernel} && %{with dist_kernel}
+BuildRequires:	kernel-module-build
+%endif
 BuildRequires:	rpmbuild(macros) >= 1.118
-%{?with_dist_kernel:%requires_releq_kernel_up}
-Requires(post,postun):	/sbin/depmod
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Zaptel telephony device driver
+Zaptel telephony device driver.
 
-%package -n kernel-%{name}
-Summary:	Zaptel kernel driver
-Release:	%{_rel}@%{_kernel_ver_str}
-Group:		Base/Kernel
-%{?_with_dist_kernel:%requires_releq_kernel_smp}
-Requires(post,postun):	/sbin/depmod
-
-%description -n kernel-%{name}
-zaptel telephony kernel driver
+%description -l pl
+Sterownik do urz±dzeñ telefonicznych Zaptel.
 
 %package devel
 Summary:	Zaptel development headers
+Summary(pl):	Pliki nag³ówkowe Zaptel
 Release:	%{_rel}
 Group:		Development/Libraries
 
 %description devel
-Zaptel development headers
+Zaptel development headers.
 
-%if %{with smp}
+%description devel -l pl
+Pliki nag³ówkowe Zaptel.
+
+%package -n kernel-%{name}
+Summary:	Zaptel Linux kernel driver
+Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
+Release:	%{_rel}@%{_kernel_ver_str}
+Group:		Base/Kernel
+%{?_with_dist_kernel:%requires_releq_kernel_up}
+Requires(post,postun):	/sbin/depmod
+
+%description -n kernel-%{name}
+Zaptel telephony Linux kernel driver.
+
+%description -n kernel-%{name} -l pl
+Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
+
 %package -n kernel-smp-%{name}
-Summary:	Zaptel SMP kernel driver
+Summary:	Zaptel Linux SMP kernel driver
+Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?_with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel-smp-%{name}
-Zaptel SMP kernel driver
-%endif
+Zaptel telephony Linux SMP kernel driver.
+
+%description -n kernel-smp-%{name} -l pl
+Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
 %setup -q -n %{name}
@@ -63,9 +77,9 @@ Zaptel SMP kernel driver
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
-
 %{__make} prereq
 
+%if %{with kernel}
 for cfg in %{buildconfigs}; do
 	mkdir -p modules/$cfg
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
@@ -89,25 +103,34 @@ for cfg in %{buildconfigs}; do
 		%{?with_verbose:V=1}
 	mv *.ko modules/$cfg/
 done
+%endif
 
+%if %{with userspace}
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
+%if %{with kernel}
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
-install -d $RPM_BUILD_ROOT/{sbin,usr/include/linux,/etc}
 for cfg in %{buildconfigs}; do
 	cfgdest=''
 	if [ "$cfg" = "smp" ]; then
 		install modules/$cfg/*.ko \
-			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc/
+			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
 	else
 		install modules/$cfg/*.ko \
-			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/
+			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
 	fi
 done
+%endif
 
-%{__make} -o all -o devices install INSTALL_PREFIX=$RPM_BUILD_ROOT
+%if %{with userspace}
+install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc}
+%{__make} -o all -o devices install \
+	INSTALL_PREFIX=$RPM_BUILD_ROOT
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -118,17 +141,16 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n kernel-%{name}
 %depmod %{_kernel_ver}
 
-%if %{with smp}
 %post -n kernel-smp-%{name}
 %depmod %{_kernel_ver}smp
 
 %postun -n kernel-smp-%{name}
 %depmod %{_kernel_ver}smp
-%endif
 
+%if %{with userspace}
 %files
-%doc README ChangeLog
 %defattr(644,root,root,755)
+%doc README ChangeLog
 %attr(600,root,root) /etc/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
@@ -388,9 +410,12 @@ rm -rf $RPM_BUILD_ROOT
 %dev(c,196,255) %attr(664,root,root) /dev/zap/pseudo
 
 %files devel
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
 /usr/include/*
+%endif
 
+%if %{with kernel}
 %files -n kernel-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*
@@ -399,4 +424,5 @@ rm -rf $RPM_BUILD_ROOT
 %files -n kernel-smp-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*
+%endif
 %endif
