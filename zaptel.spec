@@ -17,6 +17,8 @@ Group:		Base/Kernel
 #Source0:	ftp://ftp.asterisk.org/pub/telephony/zaptel/%{name}-%{version}.tar.gz
 Source0:	%{name}-%{snap}.tar.gz
 # Source0-md5:	42e27eca2e91895e337a8d1df3ac885e
+Source1:	%{name}.init
+Source2:	%{name}.sysconfig
 Patch0:		%{name}-Makefile.patch
 Patch1:		%{name}-amd64.patch
 URL:		http://www.asteriskpbx.com
@@ -55,6 +57,17 @@ Zaptel card utility programs, mainly for diagnostics.
 %description utils -l pl
 Programy narzêdziowe do kart Zaptel, s³u¿±ce g³ównie do
 diagnostyki.
+
+%package init
+Summary:	Zaptel init scripts
+Group:		Applications/Communications
+Requires:	%{name}-utils
+Requires(pre):	sh-utils
+Requires(pre):	/bin/id
+Requires(post,preun):	/sbin/chkconfig
+
+%description init
+Zaptel boot-time initialization
 
 %package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
@@ -146,10 +159,12 @@ done
 %endif
 
 %if %{with userspace}
-install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc,%{_sbindir}}
+install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir}}
 %{__make} -o all -o devices install \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT
 install torisatool makefw ztmonitor ztspeed $RPM_BUILD_ROOT%{_sbindir}
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
 
 %clean
@@ -168,12 +183,34 @@ rm -rf $RPM_BUILD_ROOT
 %depmod %{_kernel_ver}smp
 
 %if %{with userspace}
+%post init
+/sbin/chkconfig --add %{name}
+if [ -f /var/lock/subsys/%{name} ]; then
+	/etc/rc.d/init.d/%{name} restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/%{name} start\" to initialize %{name}."
+fi
+
+%preun init
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/%{name} ]; then
+		/etc/rc.d/init.d/%{name} stop 1>&2
+	fi
+	/sbin/chkconfig --del %{name}
+fi
+
+
+
 %files
 %defattr(644,root,root,755)
 %doc README ChangeLog
 %attr(600,root,root) %config(noreplace) /etc/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
+
+%files init
+%attr(744,root,root) /etc/rc.d/init.d/*
+%attr(644,root,root) /etc/sysconfig/zaptel
 
 %files devel
 %defattr(644,root,root,755)
