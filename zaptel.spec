@@ -42,6 +42,18 @@ Zaptel development headers.
 %description devel -l pl
 Pliki nag³ówkowe Zaptel.
 
+%package utils
+Summary:	Zaptel utility programs
+Summary(pl):	Programy narzêdziowe Zaptel
+Group:		Applications/Communications
+
+%description utils
+Zaptel card utility programs, mainly for diagnostics.
+
+%description utils -l pl
+Programy narzêdziowe do kart Zaptel, s³u¿±ce g³ównie do
+diagnostyki.
+
 %package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
@@ -69,15 +81,6 @@ Zaptel telephony Linux SMP kernel driver.
 
 %description -n kernel-smp-%{name} -l pl
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
-
-%if %{with userspace}
-%package utils
-Summary:	Zaptel utility programs
-Group:	Applications/Communications
-
-%description utils
-Zaptel card utility programs, mainly for diagnostics.
-%endif
 
 %prep
 %setup -q -n %{name}
@@ -423,6 +426,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
 /usr/include/*
+
+%files utils
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_sbindir}/*
 %endif
 
 %if %{with kernel}
@@ -435,9 +442,4 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*
 %endif
-%endif
-
-%if %{with userspace}
-%files utils
-%{_sbindir}/*
 %endif
