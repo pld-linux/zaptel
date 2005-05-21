@@ -9,7 +9,7 @@ Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	1.0.7
-%define		_rel	3
+%define		_rel	4
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
