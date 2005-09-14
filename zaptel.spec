@@ -8,13 +8,13 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.0.7
-%define		_rel	4
+Version:	1.0.9.2
+%define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	d043f54f38b6262ab3cd5599982a7032
+# Source0-md5:	4d9dc3afbe7e61c557115bd5442d3e5e
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-poland.patch
