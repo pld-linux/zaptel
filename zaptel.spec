@@ -8,17 +8,15 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.0.9.2
+Version:	1.2.0
 %define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	4d9dc3afbe7e61c557115bd5442d3e5e
+# Source0-md5:	83d4aaab1594c5aa0dedc6b4f221fb48
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
-Patch0:		%{name}-poland.patch
-Patch1:		%{name}-make.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -102,8 +100,6 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
 sed -i -e "s#/usr/lib#%{_libdir}#g#" Makefile
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
@@ -141,7 +137,7 @@ done
 %endif
 
 %if %{with userspace}
-%{__make} ztcfg torisatool makefw ztmonitor ztspeed
+%{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so fxstest fxotune
 %endif
 
 %install
@@ -162,11 +158,11 @@ done
 %endif
 
 %if %{with userspace}
-install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir}}
+install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
 %{__make} -o all -o devices install \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install torisatool makefw ztmonitor ztspeed $RPM_BUILD_ROOT%{_sbindir}
+install torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
@@ -209,6 +205,7 @@ fi
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
+%{_mandir}/man8/*
 
 %files init
 %defattr(644,root,root,755)
