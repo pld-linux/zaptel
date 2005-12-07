@@ -128,6 +128,11 @@ for cfg in %{buildconfigs}; do
 	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm #FIXME
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
 	touch include/config/MARKER
+%if %{!with dist_kernel}
+	mkdir -p scripts/{basic,mod}
+	ln -sf %{_kernelsrcdir}/scripts/mod/modpost scripts/mod/modpost
+	ln -sf %{_kernelsrcdir}/scripts/basic/fixdep scripts/basic/fixdep
+%endif
 	%{__make} -C %{_kernelsrcdir} modules \
 		SUBDIRS=$PWD \
 		O=$PWD \
