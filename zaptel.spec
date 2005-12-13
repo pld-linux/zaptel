@@ -52,17 +52,16 @@ Group:		Applications/Communications
 Zaptel card utility programs, mainly for diagnostics.
 
 %description utils -l pl
-Programy narzêdziowe do kart Zaptel, s³u¿±ce g³ównie do
-diagnostyki.
+Programy narzêdziowe do kart Zaptel, s³u¿±ce g³ównie do diagnostyki.
 
 %package init
 Summary:	Zaptel init scripts
 Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
-Requires:	%{name}-utils = %{version}-%{_rel}
-Requires(pre):	sh-utils
-Requires(pre):	/bin/id
 Requires(post,preun):	/sbin/chkconfig
+Requires(pre):	/bin/id
+Requires(pre):	sh-utils
+Requires:	%{name}-utils = %{version}-%{_rel}
 
 %description init
 Zaptel boot-time initialization.
