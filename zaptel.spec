@@ -8,13 +8,13 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.0
+Version:	1.2.1
 %define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	83d4aaab1594c5aa0dedc6b4f221fb48
+# Source0-md5:	efabb39a05d4c51f1e9d7d55ac097e2c
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 URL:		http://www.asterisk.org/
