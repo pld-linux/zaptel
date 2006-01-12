@@ -5,6 +5,9 @@
 %bcond_without	smp		# don't build SMP module
 %bcond_without	userspace	# don't build userspace tools
 #
+%ifarch sparc
+%undefine	with_smp
+%endif
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
@@ -124,7 +127,13 @@ for cfg in %{buildconfigs}; do
 	chmod 700 modules
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm #FIXME
+%ifarch ppc ppc64
+	install -d include/asm
+	[ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
+	[ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
+%else
+	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
+%endif
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
 	touch include/config/MARKER
 %if %{without dist_kernel}
