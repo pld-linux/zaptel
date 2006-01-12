@@ -1,0 +1,84 @@
+diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
+--- zaptel-1.2.1.org/Makefile	2005-12-04 20:29:27.000000000 +0100
++++ zaptel-1.2.1/Makefile	2006-01-12 21:50:07.253302750 +0100
+@@ -21,12 +21,12 @@
+ endif
+ KINCLUDES:=$(KSRC)/include
+ 
+-CFLAGS+=-I. -O4 -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
++CFLAGS+=-I. $(OPTFLAGS) -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
+ CFLAGS_PPC:=$(shell if uname -m | grep -q ppc; then echo "-fsigned-char"; fi)
+ CFLAGS_X86-64:=$(shell if uname -m | grep -q x86_64; then echo "-m64"; fi)
+ CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_X86-64)
+ LCFLAGS=-fPIC $(CFLAGS) -DBUILDING_TONEZONE
+-KFLAGS=-I$(KINCLUDES) -O6
++KFLAGS=-I$(KINCLUDES) $(OPTFLAGS)
+ KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
+ 	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
+ ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
+@@ -310,24 +310,6 @@
+ 		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
+ 	fi
+ 	if [ -f zttool ]; then install -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; fi
+-	if [ -f zaptel.ko ]; then \
+-		for x in $(MODULESKO); do \
+-			rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/extra/$$x ; \
+-		done; \
+-		$(MAKE) -C $(KSRC) SUBDIRS=$(PWD) INSTALL_MOD_PATH=$(INSTALL_PREFIX) INSTALL_MOD_DIR=misc modules_install; \
+-		if ! [ -f wcfxsusb.ko ]; then \
+-			rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxsusb.ko; \
+-		fi; \
+-		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxs.ko; \
+-	else \
+-		for x in $(MODULESO); do \
+-			install -D -m 644 $$x $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/$$x ; \
+-		done; \
+-		if ! [ -f wcfxsusb.o ]; then \
+-			rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxsusb.o; \
+-		fi; \
+-		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxs.o; \
+-	fi
+ 	install -D -m 755 $(LIBTONEZONE_SO) $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER)
+ 	[ `id -u` = 0 ] && /sbin/ldconfig || :
+ 	rm -f $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO)
+@@ -338,40 +320,6 @@
+ 	install -D -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include/tonezone.h
+ 	install -m 644 doc/ztcfg.8 $(INSTALL_PREFIX)/usr/share/man/man8
+ 	install -m 644 doc/zttool.8 $(INSTALL_PREFIX)/usr/share/man/man8
+-	if [ -n "$(MODCONF)" ]; then \
+-		if [ -f $(MODCONF) ]; then mv -f $(MODCONF) $(MODCONF).bak ; fi; \
+-		cat $(MODCONF).bak | grep -v "alias char-major-250" | \
+-		grep -v "post-install torisa /sbin/ztcfg" | \
+-		grep -v "post-install wcfxsusb /sbin/ztcfg" | \
+-		grep -v "alias wctdm" | \
+-		grep -v "post-install wctdm /sbin/ztcfg" > $(MODCONF); \
+-		if ! grep "options torisa" $(MODCONF); then \
+-			echo "options torisa base=$(BASEADDR)" >> $(MODCONF); \
+-		fi; \
+-		if ! grep "alias char-major-196" $(MODCONF); then \
+-			echo "alias char-major-196 $(PRIMARY)" >> $(MODCONF); \
+-		fi; \
+-		for x in $(MODULES); do \
+-			if ! grep -q "post-install $$x" $(MODCONF); then \
+-				if ! grep -q "install $$x " $(MODCONF); then \
+-					if [ "$$x" != "zaptel" ] ; then \
+-						if [ -f zaptel.ko ]; then echo "install $$x /sbin/modprobe --ignore-install $$x && /sbin/ztcfg" >> $(MODCONF); \
+-						else echo "post-install $$x /sbin/ztcfg" >> $(MODCONF); \
+-						fi; \
+-					fi; \
+-				fi; \
+-			fi; \
+-		done; \
+-		if ! grep "ias wcfxs" $(MODCONF); then \
+-			echo "alias wcfxs wctdm" >> $(MODCONF); \
+-		fi; \
+-		if ! grep "alias wct2xxp" $(MODCONF); then \
+-			echo "alias wct2xxp wct4xxp" >> $(MODCONF); \
+-		fi; \
+-	fi
+-	if [ -d /etc/modutils ]; then \
+-		/sbin/update-modules ; \
+-	fi
+ 	[ `id -u` = 0 ] && /sbin/depmod -a $(KVERS) || :
+ 	[ -f $(CONFIG_FILE) ] || install -D -m 644 zaptel.conf.sample $(CONFIG_FILE)
+ 
