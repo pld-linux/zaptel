@@ -21,6 +21,7 @@ Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
 # Source0-md5:	efabb39a05d4c51f1e9d7d55ac097e2c
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
+Patch0:		%{name}-make.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -103,13 +104,15 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
 %setup -q
+%patch0 -p1
 sed -i -e "s#/usr/lib#%{_libdir}#g#" Makefile
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
 %{__make} prereq \
-	CC="%{__cc}"
+	CC="%{__cc}" \
+	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
 for cfg in %{buildconfigs}; do
@@ -143,6 +146,8 @@ for cfg in %{buildconfigs}; do
 	ln -sf %{_kernelsrcdir}/scripts/basic/fixdep scripts/basic/fixdep
 %endif
 	%{__make} -C %{_kernelsrcdir} modules \
+		KVERS=%{_kernel_ver} \
+		KSRC=%{_kernelsrcdir} \
 		SUBDIRS=$PWD \
 		O=$PWD \
 		%{?with_verbose:V=1}
