@@ -8,11 +8,12 @@
 %ifarch sparc
 %undefine	with_smp
 %endif
+#
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	1.2.1
-%define		_rel	1
+%define		_rel	2
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
