@@ -158,7 +158,9 @@ done
 %endif
 
 %if %{with userspace}
-%{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so fxstest fxotune
+%{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
+	fxstest fxotune \
+	CC="%{__cc} %{rpmcflags}"
 %endif
 
 %install
