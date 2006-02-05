@@ -13,7 +13,7 @@ Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	1.2.3
-%define		_rel	1
+%define		_rel	2
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
@@ -122,36 +122,34 @@ for cfg in %{buildconfigs}; do
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
 		exit 1
 	fi
-	rm -rf include
 	chmod 000 modules
-	install -d include/{linux,config}
+	install -d o/include/linux
+	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
+	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
+	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
+	%{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 	%{__make} -C %{_kernelsrcdir} clean \
-		SUBDIRS=$PWD \
-		O=$PWD \
+		RCS_FIND_IGNORE="-name '*.ko' -o" \
+		M=$PWD O=$PWD/o \
 		%{?with_verbose:V=1}
-	install -d include/config
+	install -d o/include/config
 	chmod 700 modules
-	ln -sf %{_kernelsrcdir}/config-$cfg .config
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
 %ifarch ppc ppc64
 	install -d include/asm
-	[ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
-	[ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
+	[ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* o/include/asm
+	[ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* o/include/asm
 %else
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
+	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} o/include/asm
 %endif
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
-	touch include/config/MARKER
+	touch o/include/config/MARKER
 %if %{without dist_kernel}
 	mkdir -p scripts/{basic,mod}
 	ln -sf %{_kernelsrcdir}/scripts/mod/modpost scripts/mod/modpost
 	ln -sf %{_kernelsrcdir}/scripts/basic/fixdep scripts/basic/fixdep
 %endif
 	%{__make} -C %{_kernelsrcdir} modules \
-		KVERS=%{_kernel_ver} \
-		KSRC=%{_kernelsrcdir} \
-		SUBDIRS=$PWD \
-		O=$PWD \
+		CC="%{__cc}" CPP="%{__cpp}" \
+		M=$PWD O=$PWD/o \
 		%{?with_verbose:V=1}
 	mv *.ko modules/$cfg/
 done
