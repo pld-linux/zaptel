@@ -29,6 +29,7 @@ BuildRequires:	kernel-module-build
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.153
 BuildRequires:	sed >= 4.0
+BuildRequires:	newt-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -112,7 +113,7 @@ sed -i -e "s#/usr/lib#%{_libdir}#g#" Makefile
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
-%{__make} prereq \
+%{__make} prereq zttest \
 	CC="%{__cc}" \
 	OPTFLAGS="%{rpmcflags}"
 
@@ -170,7 +171,7 @@ install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig}
 %{__make} -o all -o devices install \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
+install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
