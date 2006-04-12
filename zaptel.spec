@@ -9,11 +9,11 @@
 %undefine	with_smp
 %endif
 #
+%define		_rel	1
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	1.2.5
-%define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
@@ -27,9 +27,9 @@ URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
+BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.153
 BuildRequires:	sed >= 4.0
-BuildRequires:	newt-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -211,7 +211,7 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc README ChangeLog
-%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/zaptel.conf
+%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
 %{_mandir}/man8/*
