@@ -12,22 +12,24 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.1
-%define		_rel	3
+Version:	1.2.5
+%define		_rel	1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	efabb39a05d4c51f1e9d7d55ac097e2c
+# Source0-md5:	8c8561259d29a314aa5a076050124697
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
+Patch1:		%{name}-sparc.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.153
 BuildRequires:	sed >= 4.0
+BuildRequires:	newt-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -105,12 +107,13 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 sed -i -e "s#/usr/lib#%{_libdir}#g#" Makefile
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
-%{__make} prereq \
+%{__make} prereq zttest \
 	CC="%{__cc}" \
 	OPTFLAGS="%{rpmcflags}"
 
@@ -120,43 +123,30 @@ for cfg in %{buildconfigs}; do
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
 		exit 1
 	fi
-	rm -rf include
 	chmod 000 modules
-	install -d include/{linux,config}
+	install -d o/include/linux
+	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
+	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
+	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
+	%{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 	%{__make} -C %{_kernelsrcdir} clean \
-		SUBDIRS=$PWD \
-		O=$PWD \
+		RCS_FIND_IGNORE="-name '*.ko' -o" \
+		M=$PWD O=$PWD/o \
 		%{?with_verbose:V=1}
-	install -d include/config
+	install -d o/include/config
 	chmod 700 modules
-	ln -sf %{_kernelsrcdir}/config-$cfg .config
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
-%ifarch ppc ppc64
-	install -d include/asm
-	[ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
-	[ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
-%else
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
-%endif
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
-	touch include/config/MARKER
-%if %{without dist_kernel}
-	mkdir -p scripts/{basic,mod}
-	ln -sf %{_kernelsrcdir}/scripts/mod/modpost scripts/mod/modpost
-	ln -sf %{_kernelsrcdir}/scripts/basic/fixdep scripts/basic/fixdep
-%endif
 	%{__make} -C %{_kernelsrcdir} modules \
-		KVERS=%{_kernel_ver} \
-		KSRC=%{_kernelsrcdir} \
-		SUBDIRS=$PWD \
-		O=$PWD \
+		CC="%{__cc}" CPP="%{__cpp}" \
+		M=$PWD O=$PWD/o \
 		%{?with_verbose:V=1}
 	mv *.ko modules/$cfg/
 done
 %endif
 
 %if %{with userspace}
-%{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so fxstest fxotune
+%{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
+	fxstest fxotune \
+	CC="%{__cc} %{rpmcflags}"
 %endif
 
 %install
@@ -181,7 +171,7 @@ install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig}
 %{__make} -o all -o devices install \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
+install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
