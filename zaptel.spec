@@ -9,7 +9,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	1
+%define		_rel	2
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
@@ -28,7 +28,7 @@ URL:		http://www.asterisk.org/
 BuildRequires:	kernel-module-build
 %endif
 BuildRequires:	newt-devel
-BuildRequires:	rpmbuild(macros) >= 1.153
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -66,9 +66,8 @@ Summary:	Zaptel init scripts
 Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
-Requires(pre):	/bin/id
-Requires(pre):	sh-utils
 Requires:	%{name}-utils = %{version}-%{_rel}
+Requires:	rc-scripts
 
 %description init
 Zaptel boot-time initialization.
@@ -167,7 +166,7 @@ done
 %endif
 
 %if %{with userspace}
-install -d $RPM_BUILD_ROOT{/sbin,/usr/include/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
+install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
 %{__make} -o all -o devices install \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
@@ -194,17 +193,11 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with userspace}
 %post init
 /sbin/chkconfig --add %{name}
-if [ -f /var/lock/subsys/%{name} ]; then
-	/etc/rc.d/init.d/%{name} restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/%{name} start\" to initialize %{name}."
-fi
+%service %{name} restart
 
 %preun init
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/%{name} ]; then
-		/etc/rc.d/init.d/%{name} stop 1>&2
-	fi
+	%service %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
 
