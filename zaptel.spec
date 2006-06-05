@@ -9,16 +9,16 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	2
+%define		_rel	1
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.5
+Version:	1.2.6
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	8c8561259d29a314aa5a076050124697
+# Source0-md5:	c6058b74f43ae12a29e486cf1e919562
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
