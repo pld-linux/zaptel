@@ -25,6 +25,7 @@ Patch0:		%{name}-make.patch
 Patch1:		%{name}-sparc.patch
 Patch2:		%{name}-LIBDIR.patch
 Patch3:		%{name}-LDFLAGS.patch
+Patch4:		%{name}-as_needed-fix.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -110,6 +111,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
