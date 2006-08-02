@@ -23,13 +23,14 @@ Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sparc.patch
+Patch2:		%{name}-LIBDIR.patch
+Patch3:		%{name}-LDFLAGS.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
 BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
-BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -107,13 +108,15 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-sed -i -e "s#/usr/lib#%{_libdir}#g#" Makefile
+%patch2 -p1
+%patch3 -p1
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
 %{__make} prereq zttest \
 	CC="%{__cc}" \
+	LDFLAGS="%{rpmldflags}" \
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
@@ -145,7 +148,8 @@ done
 %if %{with userspace}
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
 	fxstest fxotune \
-	CC="%{__cc} %{rpmcflags}"
+	CC="%{__cc} %{rpmcflags}" \
+	LDFLAGS="%{rpmldflags}"
 %endif
 
 %install
@@ -168,6 +172,7 @@ done
 %if %{with userspace}
 install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
 %{__make} -o all -o devices install \
+	LIBDIR="%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
 install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
