@@ -13,12 +13,12 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.6
+Version:	1.2.7
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	c6058b74f43ae12a29e486cf1e919562
+# Source0-md5:	5134f361d92e5ec7342d7e80bad7d30a
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
@@ -26,6 +26,7 @@ Patch1:		%{name}-sparc.patch
 Patch2:		%{name}-LIBDIR.patch
 Patch3:		%{name}-LDFLAGS.patch
 Patch4:		%{name}-as_needed-fix.patch
+Patch5:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -112,11 +113,13 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
+
 %build
-%{__make} prereq zttest \
+%{__make} prereq vpm450m_fw.h zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
 	OPTFLAGS="%{rpmcflags}"
