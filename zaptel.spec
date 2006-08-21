@@ -144,7 +144,7 @@ for cfg in %{buildconfigs}; do
 	chmod 700 modules
 	%{__make} -C %{_kernelsrcdir} modules \
 		CC="%{__cc}" CPP="%{__cpp}" \
-		M=$PWD O=$PWD/o \
+		M=$PWD O=$PWD/o SUBDIRS=$PWD \
 		%{?with_verbose:V=1}
 	mv *.ko modules/$cfg/
 done
