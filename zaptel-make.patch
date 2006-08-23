@@ -1,17 +1,6 @@
 diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
 --- zaptel-1.2.1.org/Makefile	2005-12-04 20:29:27.000000000 +0100
 +++ zaptel-1.2.1/Makefile	2006-01-12 21:50:07.253302750 +0100
-@@ -7,9 +7,8 @@
- 
- 
- HOSTCC=gcc
--ifeq ($(PWD),)
- PWD:=$(shell pwd)
--endif
-+
- # If you want to build for a kernel other than the current kernel, set KVERS
- ifndef KVERS
- KVERS:=$(shell uname -r)
 @@ -24,12 +24,12 @@
  endif
  KINCLUDES:=$(KSRC)/include
@@ -27,24 +16,6 @@ diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
  	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
  ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
-@@ -111,7 +111,7 @@
- 
- MOD_DESTDIR:=zaptel
- 
--EXTRA_CFLAGS:=-I$(PWD)/include  -I$(PWD)/include/oct6100api
-+EXTRA_CFLAGS:=-I$(SUBDIRS)/include -I$(SUBDIRS)/include/oct6100api
- obj-m:=$(MODULESO)
- wct4xxp-objs:=wct4xxp_base.o vpm450m.o
- 
-@@ -177,7 +177,7 @@
- 	$(CC) $(KFLAGS) -o $@ -c $<
- 
- vpm450m.o: vpm450m.c zaptel.h
--	$(CC) $(KFLAGS) -I$(PWD)/include  -I$(PWD)/include/oct6100api -o $@ -c $<
-+	$(CC) $(KFLAGS) -I$(PWD)/include -I$(PWD)/include/oct6100api -I$(SUBDIRS)/include -I$(SUBDIRS)/include/oct6100api -o $@ -c $<
- 
- wct4xxp.o: wct4xxp_base.o vpm450m.o
- 	$(LD) -r -o $@ wct4xxp_base.o vpm450m.o
 @@ -322,20 +322,6 @@
  		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
  	fi
