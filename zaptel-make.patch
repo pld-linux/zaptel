@@ -1,52 +1,55 @@
 diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
 --- zaptel-1.2.1.org/Makefile	2005-12-04 20:29:27.000000000 +0100
 +++ zaptel-1.2.1/Makefile	2006-01-12 21:50:07.253302750 +0100
-@@ -23,12 +23,12 @@
- endif
+@@ -33,7 +33,7 @@
+ KVERS_MAJ:=$(shell echo $(KVERS) | cut -d. -f1-2)
  KINCLUDES:=$(KSRC)/include
  
 -CFLAGS+=-I. -O4 -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
 +CFLAGS+=-I. $(OPTFLAGS) -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
- CFLAGS_PPC:=$(shell if uname -m | grep -q ppc; then echo "-fsigned-char"; fi)
- CFLAGS_X86-64:=$(shell if uname -m | grep -q x86_64; then echo "-m64"; fi)
- CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_X86-64)
- LCFLAGS:=-fPIC $(CFLAGS) -DBUILDING_TONEZONE
--KFLAGS:=-I$(KINCLUDES) -O6
-+KFLAGS:=-I$(KINCLUDES) $(OPTFLAGS)
+ ifneq (,$(findstring ppc,$(UNAME_M)))
+ CFLAGS_PPC:=-fsigned-char
+ endif
+@@ -42,7 +42,7 @@
+ endif
+ CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_x86_64)
+ LCFLAGS=-fPIC $(CFLAGS) -DBUILDING_TONEZONE
+-KFLAGS=-I$(KINCLUDES) -O6
++KFLAGS=-I$(KINCLUDES) $(OPTFLAGS)
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
  	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
  ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
-@@ -323,20 +323,6 @@
- 		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
+@@ -370,33 +370,9 @@
+ 	if [ -f zttool ]; then \
+ 		$(INSTALL) -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; \
  	fi
- 	if [ -f zttool ]; then install -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; fi
 -ifeq ($(BUILDVER),linux26)
 -	for x in $(MODULESKO); do \
 -		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/extra/$$x ; \
 -	done; \
--	$(KMAKE_INST);
+-	$(KMAKE_INST); \
+-	if [ -f datamods/syncppp.ko ]; then \
+-		$(MAKE) -C datamods install; \
+-	else \
+-		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/{hdlc_*,syncppp}.ko; \
+-	fi
 -else
 -	for x in $(MODULESO); do \
--		install -D -m 644 $$x $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/$$x ; \
--	done;
+-		$(INSTALL) -D -m 644 $$x $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/$$x ; \
+-	done
 -endif
 -	if ! [ -f wcfxsusb.o ]; then \
 -		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxsusb.o; \
 -	fi; \
 -	rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxs.o
- 	install -D -m 755 $(LIBTONEZONE_SO) $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER)
- 	[ `id -u` = 0 ] && /sbin/ldconfig || :
- 	rm -f $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO)
-@@ -350,12 +336,7 @@
- 	install -D -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include/tonezone.h
- 	install -m 644 doc/ztcfg.8 $(INSTALL_PREFIX)/usr/share/man/man8
- 	install -m 644 doc/zttool.8 $(INSTALL_PREFIX)/usr/share/man/man8
+ 	$(INSTALL) -m 644 doc/ztcfg.8 $(INSTALL_PREFIX)/usr/share/man/man8
+ 	$(INSTALL) -m 644 doc/zttool.8 $(INSTALL_PREFIX)/usr/share/man/man8
 -	[ `id -u` = 0 ] && /sbin/depmod -a $(KVERS) || :
- 	[ -f $(CONFIG_FILE) ] || install -D -m 644 zaptel.conf.sample $(CONFIG_FILE)
+ 	[ -f $(CONFIG_FILE) ] || $(INSTALL) -D -m 644 zaptel.conf.sample $(CONFIG_FILE)
 -	build_tools/genmodconf $(BUILDVER) "$(ROOT_PREFIX)" "$(filter-out zaptel,$(MODULES))"
 -	@if [ -d /etc/modutils ]; then \
 -		/sbin/update-modules ; \
 -	fi
  
- install-udev: devices
- 
+ install-libs: $(LTZ_SO) $(LTZ_A)
+ 	$(INSTALL) -D -m 755 $(LTZ_A) $(LIB_DIR)/$(LTZ_A)
