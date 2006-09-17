@@ -18,7 +18,7 @@ Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	zaptel-1.2.10.20060917.tar.gz
-# Source0-md5:	c2f5798196ac1b53f4161547cc4efb2c
+# Source0-md5:	3d0d93238f52d3ad6d71534eead6ab4f
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
