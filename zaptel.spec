@@ -13,12 +13,12 @@
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.8
+Version:	1.2.9.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	f79ba7a843f86b1a072d808b712b8d44
+# Source0-md5:	c2f5798196ac1b53f4161547cc4efb2c
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
@@ -119,7 +119,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 
 %build
-%{__make} prereq vpm450m_fw.h zttest \
+%{__make} prereq zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
 	OPTFLAGS="%{rpmcflags}"

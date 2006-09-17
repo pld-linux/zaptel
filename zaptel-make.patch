@@ -1,12 +1,12 @@
 diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
 --- zaptel-1.2.1.org/Makefile	2005-12-04 20:29:27.000000000 +0100
 +++ zaptel-1.2.1/Makefile	2006-01-12 21:50:07.253302750 +0100
-@@ -24,12 +24,12 @@
+@@ -23,12 +23,12 @@
  endif
  KINCLUDES:=$(KSRC)/include
  
--CFLAGS+=-I. -Iinclude -O4 -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
-+CFLAGS+=-I. -Iinclude $(OPTFLAGS) -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
+-CFLAGS+=-I. -O4 -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
++CFLAGS+=-I. $(OPTFLAGS) -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
  CFLAGS_PPC:=$(shell if uname -m | grep -q ppc; then echo "-fsigned-char"; fi)
  CFLAGS_X86-64:=$(shell if uname -m | grep -q x86_64; then echo "-m64"; fi)
  CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_X86-64)
@@ -16,7 +16,7 @@ diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
  	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
  ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
-@@ -322,20 +322,6 @@
+@@ -323,20 +323,6 @@
  		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
  	fi
  	if [ -f zttool ]; then install -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; fi
@@ -37,7 +37,7 @@ diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
  	install -D -m 755 $(LIBTONEZONE_SO) $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER)
  	[ `id -u` = 0 ] && /sbin/ldconfig || :
  	rm -f $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO)
-@@ -349,12 +335,7 @@
+@@ -350,12 +336,7 @@
  	install -D -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include/tonezone.h
  	install -m 644 doc/ztcfg.8 $(INSTALL_PREFIX)/usr/share/man/man8
  	install -m 644 doc/zttool.8 $(INSTALL_PREFIX)/usr/share/man/man8
