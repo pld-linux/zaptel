@@ -9,15 +9,15 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	1
+%define		_rel	0.20060917
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.9.1
+Version:	1.2.10
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
+Source0:	zaptel-1.2.10.20060917.tar.gz
 # Source0-md5:	c2f5798196ac1b53f4161547cc4efb2c
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
@@ -109,16 +109,18 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+#%patch1 -p1
+#%patch2 -p1
+#%patch3 -p1
+#%patch4 -p1
 %patch5 -p1
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 
 %build
+%configure
+
 %{__make} prereq zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
@@ -213,7 +215,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc README ChangeLog
+%doc README
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
@@ -227,8 +229,8 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
-%{_includedir}/linux/*
-%{_includedir}/*.h
+%{_includedir}/zaptel/
+%{_includedir}/zaptel/*.h
 
 %files utils
 %defattr(644,root,root,755)
