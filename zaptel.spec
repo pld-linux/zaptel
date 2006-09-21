@@ -9,16 +9,16 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	0.20060917
+%define		_rel	0.beta1
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.10
+Version:	1.4.0
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	zaptel-1.2.10.20060917.tar.gz
-# Source0-md5:	3d0d93238f52d3ad6d71534eead6ab4f
+Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}-beta1.tar.gz
+# Source0-md5:	6d2bae038c85770fd09a323f192cd682
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
@@ -107,7 +107,7 @@ Zaptel telephony Linux SMP kernel driver.
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}-beta1
 %patch0 -p1
 #%patch1 -p1
 #%patch2 -p1
