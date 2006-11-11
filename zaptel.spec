@@ -29,11 +29,15 @@ Patch4:		%{name}-as_needed-fix.patch
 Patch5:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
-BuildRequires:	kernel-module-build
+BuildRequires:	kernel%{_alt_kernel}-module-build
 %endif
+%if %{with userspace}
 BuildRequires:	newt-devel
-BuildRequires:	rpmbuild(macros) >= 1.268
+%endif
+BuildRequires:	rpmbuild(macros) >= 1.326
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define	modules	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
 
 %description
 Zaptel telephony device driver.
@@ -78,7 +82,7 @@ Zaptel boot-time initialization.
 %description init -l pl
 Inicjalizacja Zaptel w czasie startu systemu.
 
-%package -n kernel-%{name}
+%package -n kernel%{_alt_kernel}-%{name}
 Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -86,13 +90,13 @@ Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
 
-%description -n kernel-%{name}
+%description -n kernel%{_alt_kernel}-%{name}
 Zaptel telephony Linux kernel driver.
 
-%description -n kernel-%{name} -l pl
+%description -n kernel%{_alt_kernel}-%{name} -l pl
 Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
 
-%package -n kernel-smp-%{name}
+%package -n kernel%{_alt_kernel}-smp-%{name}
 Summary:	Zaptel Linux SMP kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -100,10 +104,10 @@ Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
-%description -n kernel-smp-%{name}
+%description -n kernel%{_alt_kernel}-smp-%{name}
 Zaptel telephony Linux SMP kernel driver.
 
-%description -n kernel-smp-%{name} -l pl
+%description -n kernel%{_alt_kernel}-smp-%{name} -l pl
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
@@ -115,9 +119,6 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %patch4 -p1
 %patch5 -p1
 
-%define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
-
-
 %build
 %{__make} prereq zttest \
 	CC="%{__cc}" \
@@ -125,29 +126,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
-for cfg in %{buildconfigs}; do
-	mkdir -p modules/$cfg
-	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
-		exit 1
-	fi
-	chmod 000 modules
-	install -d o/include/linux
-	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
-	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
-	%{__make} -C %{_kernelsrcdir} clean \
-		RCS_FIND_IGNORE="-name '*.ko' -o" \
-		M=$PWD O=$PWD/o \
-		%{?with_verbose:V=1}
-	install -d o/include/config
-	chmod 700 modules
-	%{__make} -C %{_kernelsrcdir} modules \
-		CC="%{__cc}" CPP="%{__cpp}" \
-		M=$PWD O=$PWD/o SUBDIRS=$PWD \
-		%{?with_verbose:V=1}
-	mv *.ko modules/$cfg/
-done
+%build_kernel_modules SUBDIRS=$PWD -m %{modules}
 %endif
 
 %if %{with userspace}
@@ -161,17 +140,7 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
-for cfg in %{buildconfigs}; do
-	cfgdest=''
-	if [ "$cfg" = "smp" ]; then
-		install modules/$cfg/*.ko \
-			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
-	else
-		install modules/$cfg/*.ko \
-			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
-	fi
-done
+%install_kernel_modules -m %{modules} -d misc
 %endif
 
 %if %{with userspace}
@@ -188,16 +157,16 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n kernel-%{name}
+%post -n kernel%{_alt_kernel}-%{name}
 %depmod %{_kernel_ver}
 
-%postun -n kernel-%{name}
+%postun -n kernel%{_alt_kernel}-%{name}
 %depmod %{_kernel_ver}
 
-%post -n kernel-smp-%{name}
+%post -n kernel%{_alt_kernel}-smp-%{name}
 %depmod %{_kernel_ver}smp
 
-%postun -n kernel-smp-%{name}
+%postun -n kernel%{_alt_kernel}-smp-%{name}
 %depmod %{_kernel_ver}smp
 
 %if %{with userspace}
@@ -236,12 +205,12 @@ fi
 %endif
 
 %if %{with kernel}
-%files -n kernel-%{name}
+%files -n kernel%{_alt_kernel}-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 
 %if %{with smp}
-%files -n kernel-smp-%{name}
+%files -n kernel%{_alt_kernel}-smp-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
 %endif
