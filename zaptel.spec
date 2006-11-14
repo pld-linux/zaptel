@@ -34,7 +34,7 @@ BuildRequires:	kernel%{_alt_kernel}-module-build
 %if %{with userspace}
 BuildRequires:	newt-devel
 %endif
-BuildRequires:	rpmbuild(macros) >= 1.326
+BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	modules	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
