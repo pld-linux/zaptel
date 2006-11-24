@@ -16,6 +16,15 @@ diff -ur zaptel-1.2.1.org/Makefile zaptel-1.2.1/Makefile
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
  	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
  ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
+@@ -106,7 +106,7 @@
+ 
+ MODULES:=zaptel tor2 torisa wcusb wcfxo wctdm wctdm24xxp \
+ 	 ztdynamic ztd-eth wct1xxp wcte11xp pciradio \
+-         ztd-loc # ztdummy
++         ztd-loc ztdummy
+ #MODULES+=wcfxsusb
+ # build ztdummy by default for 2.6 kernels
+ ifeq ($(BUILDVER),linux26)
 @@ -323,20 +323,6 @@
  		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
  	fi
