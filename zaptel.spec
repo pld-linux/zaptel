@@ -9,7 +9,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	0.beta2
+%define		_rel 1	
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
@@ -17,8 +17,8 @@ Version:	1.4.0
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}-beta2.tar.gz
-# Source0-md5:	e522d961759ba9ba4ea5521052dcee0a
+Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
+# Source0-md5:	27b43dfa3f1629f063a20779300f68c8
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
@@ -107,7 +107,7 @@ Zaptel telephony Linux SMP kernel driver.
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
-%setup -q -n %{name}-%{version}-beta2
+%setup -q -n %{name}-%{version}
 %patch0 -p1
 #%patch1 -p1
 #%patch2 -p1
@@ -185,6 +185,8 @@ install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfi
 install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
+
+install zconfig.h ecdis.h fasthdlc.h $RPM_BUILD_ROOT/usr/include/zaptel/
 %endif
 
 %clean
