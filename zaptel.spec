@@ -186,7 +186,7 @@ install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_RO
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 
-install zconfig.h ecdis.h fasthdlc.h $RPM_BUILD_ROOT/usr/include/zaptel/
+install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel/
 %endif
 
 %clean
