@@ -16,7 +16,7 @@
 #
 %define		_rel	3
 Summary:	Zaptel telephony device support
-Summary(pl.UTF-8):   Obsługa urządzeń telefonicznych Zaptel
+Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
 Version:	1.2.10
 Release:	%{_rel}
@@ -52,7 +52,7 @@ Sterownik do urządzeń telefonicznych Zaptel.
 
 %package devel
 Summary:	Zaptel development headers
-Summary(pl.UTF-8):   Pliki nagłówkowe Zaptel
+Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
 
@@ -64,7 +64,7 @@ Pliki nagłówkowe Zaptel.
 
 %package utils
 Summary:	Zaptel utility programs
-Summary(pl.UTF-8):   Programy narzędziowe Zaptel
+Summary(pl.UTF-8):	Programy narzędziowe Zaptel
 Group:		Applications/Communications
 
 %description utils
@@ -75,7 +75,7 @@ Programy narzędziowe do kart Zaptel, służące głównie do diagnostyki.
 
 %package init
 Summary:	Zaptel init scripts
-Summary(pl.UTF-8):   Skrypty inicjalizujące Zaptel
+Summary(pl.UTF-8):	Skrypty inicjalizujące Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-utils = %{version}-%{_rel}
@@ -89,7 +89,7 @@ Inicjalizacja Zaptel w czasie startu systemu.
 
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Zaptel Linux kernel driver
-Summary(pl.UTF-8):   Sterownik Zaptel dla jądra Linuksa
+Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
@@ -103,7 +103,7 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 
 %package -n kernel%{_alt_kernel}-smp-%{name}
 Summary:	Zaptel Linux SMP kernel driver
-Summary(pl.UTF-8):   Sterownik Zaptel dla jądra Linuksa SMP
+Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
