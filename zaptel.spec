@@ -13,14 +13,19 @@
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):   Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.4.0
+Version:	1.4.0.2273
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	27b43dfa3f1629f063a20779300f68c8
+#Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
+Source0:	%{name}-%{version}.tar.gz
+# Source0-md5:	4d34a4cf755d0178d0559c29d26363b8
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
+Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
+# Source3-md5:	18e6e6879070a8d61068e1c87b8c2b22
+Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-128-1.05.01.tar.gz
+# Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sparc.patch
 Patch2:		%{name}-LIBDIR.patch
@@ -127,6 +132,8 @@ Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
+cp %{SOURCE3} firmware/
+cp %{SOURCE4} firmware/
 for cfg in %{buildconfigs}; do
 	mkdir -p modules/$cfg
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
@@ -147,6 +154,7 @@ for cfg in %{buildconfigs}; do
 	%{__make} -C %{_kernelsrcdir} modules \
 		CC="%{__cc}" CPP="%{__cpp}" \
 		M=$PWD O=$PWD/o SUBDIRS=$PWD \
+		DOWNLOAD=wget \
 		%{?with_verbose:V=1}
 	mv *.ko modules/$cfg/
 done
