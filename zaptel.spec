@@ -19,12 +19,12 @@
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.10
+Version:	1.2.15
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	25f9a78272104efdbd44261e33edb725
+# Source0-md5:	9072603b6e53e89d74973bd254e8285e
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
@@ -185,6 +185,7 @@ if [ "$1" = "0" ]; then
 	%service %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
+%endif
 
 %files
 %defattr(644,root,root,755)
