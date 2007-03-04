@@ -135,6 +135,7 @@ Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 cp %{SOURCE3} firmware/
 cp %{SOURCE4} firmware/
 for cfg in %{buildconfigs}; do
+	rm -rf o
 	mkdir -p modules/$cfg
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
 		exit 1
@@ -171,13 +172,14 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 for cfg in %{buildconfigs}; do
 	cfgdest=''
 	if [ "$cfg" = "smp" ]; then
+		install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
 		install modules/$cfg/*.ko \
 			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
 	else
+		install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
 		install modules/$cfg/*.ko \
 			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
 	fi
