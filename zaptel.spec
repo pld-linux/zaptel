@@ -175,7 +175,6 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n kernel%{_alt_kernel}-smp-%{name}
 %depmod %{_kernel_ver}smp
 
-%if %{with userspace}
 %post init
 /sbin/chkconfig --add %{name}
 %service %{name} restart
@@ -185,7 +184,6 @@ if [ "$1" = "0" ]; then
 	%service %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
-%endif
 
 %files
 %defattr(644,root,root,755)
