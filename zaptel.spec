@@ -14,7 +14,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	3
+%define		_rel	4
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
@@ -55,6 +55,8 @@ Summary:	Zaptel development headers
 Summary(pl):	Pliki nag³ówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
+# files in /usr/include/linux
+Requires:	linux-libc-headers
 
 %description devel
 Zaptel development headers.
