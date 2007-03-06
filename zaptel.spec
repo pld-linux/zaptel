@@ -56,6 +56,8 @@ Summary:	Zaptel development headers
 Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
+# files in /usr/include/linux
+Requires:	linux-libc-headers
 
 %description devel
 Zaptel development headers.
