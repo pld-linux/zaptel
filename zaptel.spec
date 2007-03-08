@@ -14,16 +14,16 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	4
+%define		_rel	1
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.10
+Version:	1.2.15
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	25f9a78272104efdbd44261e33edb725
+# Source0-md5:	9072603b6e53e89d74973bd254e8285e
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
@@ -42,7 +42,7 @@ BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
+%define	modules	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp,wcusb,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic,zttranscode
 
 %description
 Zaptel telephony device driver.
@@ -138,7 +138,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %if %{with userspace}
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
-	fxstest fxotune \
+	fxstest fxotune gendigits \
 	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
 %endif
@@ -156,7 +156,7 @@ install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfi
 	LIBDIR="%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
+install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune gendigits $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
