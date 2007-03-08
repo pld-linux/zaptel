@@ -15,7 +15,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	3
+%define		_rel	4
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
@@ -43,7 +43,7 @@ BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
+%define	modules pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp,wcusb,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic,zttranscode
 
 %description
 Zaptel telephony device driver.
@@ -139,7 +139,7 @@ Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 
 %if %{with userspace}
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
-	fxstest fxotune \
+	fxstest fxotune gendigits \
 	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
 %endif
@@ -157,7 +157,7 @@ install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfi
 	LIBDIR="%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
+install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune gendigits $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
