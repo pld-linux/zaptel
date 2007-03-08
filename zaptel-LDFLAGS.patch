@@ -1,16 +1,15 @@
-diff -Nur zaptel-1.2.6/Makefile zaptel-1.2.6.LDFLAGS/Makefile
---- zaptel-1.2.6/Makefile	2006-08-02 04:47:06.000000000 +0200
-+++ zaptel-1.2.6.LDFLAGS/Makefile	2006-08-02 04:47:07.000000000 +0200
-@@ -176,7 +176,7 @@
+--- zaptel-1.2.15.orig/Makefile	2007-03-02 23:29:04.000000000 +0100
++++ zaptel-1.2.15/Makefile	2007-03-08 11:22:22.443090250 +0100
+@@ -214,7 +214,7 @@
  tor2ee.o: tor2-hw.h
  
  tor2ee: tor2ee.o
 -	$(CC) $(CFLAGS) -o $@ $^ -lpci
-+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $^ -lpci
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lpci
  
  zonedata.lo: zonedata.c
  	$(CC) -c $(LCFLAGS) -o $@ $^
-@@ -185,7 +185,7 @@
+@@ -223,7 +223,7 @@
  	$(CC) -c $(LCFLAGS) -o $@ $^
  
  torisatool: torisatool.o
@@ -19,16 +18,16 @@ diff -Nur zaptel-1.2.6/Makefile zaptel-1.2.6.LDFLAGS/Makefile
  
  tones.h: gendigits
  	./gendigits > $@
-@@ -197,7 +197,7 @@
+@@ -235,7 +235,7 @@
  	./makefw pciradio.rbt radfw > radfw.h
  
  gendigits: gendigits.o
 -	$(CC) -o $@ $^ -lm
 +	$(CC) $(LDFLAGS) -o $@ $^ -lm
  
- zaptel.c: tones.h 
+ prereq: tones.h tor2fw.h radfw.h version.h
  
-@@ -213,16 +213,16 @@
+@@ -249,16 +249,16 @@
  	$(CC) -o $@ -c $^
  
  zttool: zttool.o
@@ -49,7 +48,7 @@ diff -Nur zaptel-1.2.6/Makefile zaptel-1.2.6.LDFLAGS/Makefile
  
  sethdlc-new.o: sethdlc-new.c
  	$(CC) -o $@ -c $(CFLAGS) -I$(KINCLUDES) $^
-@@ -231,18 +231,18 @@
+@@ -267,18 +267,18 @@
  	ar rcs libtonezone.a $^
  
  $(LIBTONEZONE_SO): $(TZOBJS)
@@ -67,12 +66,12 @@ diff -Nur zaptel-1.2.6/Makefile zaptel-1.2.6.LDFLAGS/Makefile
 +	$(CC) $(LDFLAGS) -o $@ $^ -lm
  
  ztcfg-dude: ztcfg-dude.o mknotch.o complex.o $(LIBTONEZONE_SO)
--	$(CC) -o $@ $^ -lm
-+	$(CC) $(LDFLAGS) -o $@ $^ -lm
+-	$(CC) -o $@ $^ -lm -lstdc++
++	$(CC) $(LDFLAGS) -o $@ $^ -lm -lstdc++
  
  mknotch.o: mknotch.cc
  	$(CC) -o $@ -c $^
-@@ -254,22 +254,22 @@
+@@ -290,22 +290,22 @@
  	$(CC) -o $@ -g -c $^
  
  usbfxstest: usbfxstest.o 

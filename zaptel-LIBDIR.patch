@@ -1,7 +1,6 @@
-diff -Nur zaptel-1.2.6/Makefile zaptel-1.2.6.LIBDIR/Makefile
---- zaptel-1.2.6/Makefile	2006-08-02 04:46:13.000000000 +0200
-+++ zaptel-1.2.6.LIBDIR/Makefile	2006-08-02 04:46:13.000000000 +0200
-@@ -308,14 +308,14 @@
+--- zaptel-1.2.15.orig/Makefile	2007-03-08 11:26:17.205762000 +0100
++++ zaptel-1.2.15/Makefile	2007-03-08 11:33:21.632287000 +0100
+@@ -353,14 +353,14 @@
  		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
  	fi
  	if [ -f zttool ]; then install -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; fi
@@ -15,9 +14,9 @@ diff -Nur zaptel-1.2.6/Makefile zaptel-1.2.6.LIBDIR/Makefile
 +		$(INSTALL_PREFIX)$(LIBDIR)/$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER)
  	ln -sf $(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER) \
 -		$(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO)
--	if [ -x /usr/sbin/sestatus ] && (/usr/sbin/sestatus | grep "SELinux status:" | grep -q "enabled") ; then restorecon -v $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO); fi
+-	if [ -x /usr/sbin/sestatus ] && (/usr/sbin/sestatus | grep "SELinux status:" | grep -q "enabled") ; then /sbin/restorecon -v $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO); fi
 +		$(INSTALL_PREFIX)$(LIBDIR)/$(LIBTONEZONE_SO)
-+	if [ -x /usr/sbin/sestatus ] && (/usr/sbin/sestatus | grep "SELinux status:" | grep -q "enabled") ; then restorecon -v $(INSTALL_PREFIX)$(LIBDIR)/$(LIBTONEZONE_SO); fi
++	if [ -x /usr/sbin/sestatus ] && (/usr/sbin/sestatus | grep "SELinux status:" | grep -q "enabled") ; then /sbin/restorecon -v $(INSTALL_PREFIX)$(IBDIR)/$(LIBTONEZONE_SO); fi
  	install -D -m 644 zaptel.h $(INSTALL_PREFIX)/usr/include/linux/zaptel.h
  	install -D -m 644 torisa.h $(INSTALL_PREFIX)/usr/include/linux/torisa.h
  	install -D -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include/tonezone.h
