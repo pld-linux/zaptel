@@ -2,6 +2,7 @@
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	kernel		# don't build kernel modules
+%bcond_without	up		# don't build UP module
 %bcond_without	smp		# don't build SMP module
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	grsec_kernel	# build for kernel-grsecurity
@@ -14,7 +15,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	1
+%define		_rel	2
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
@@ -176,7 +177,6 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n kernel%{_alt_kernel}-smp-%{name}
 %depmod %{_kernel_ver}smp
 
-%if %{with userspace}
 %post init
 /sbin/chkconfig --add %{name}
 %service %{name} restart
@@ -212,11 +212,13 @@ fi
 %endif
 
 %if %{with kernel}
+%if %{with up} || %{without dist_kernel}
 %files -n kernel%{_alt_kernel}-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
+%endif
 
-%if %{with smp}
+%if %{with smp} && %{with dist_kernel}
 %files -n kernel%{_alt_kernel}-smp-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
