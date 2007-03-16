@@ -1,3 +1,6 @@
+# TODO
+# - sparc, ppc fail
+# - zaptel-1.2.15/ztdummy.c:103:2: warning: #warning This module will not be usable since the kernel HZ setting is not 1000 ticks per second.
 #
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
