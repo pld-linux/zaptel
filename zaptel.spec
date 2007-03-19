@@ -46,33 +46,15 @@ BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-# fails on those archidectures
-# xpp/xpd_fxo is missing on ppc,alpha,sparc
-# xpp/xpp is missing on ppc,sparc,alpha
-# xpp/xpp_usb is missing on ppc,sparc,alpha
+%define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
+%define	modules_2	wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
+
+# modules added in 1.2.15 (see r1.75.2.2)
 %ifnarch ppc alpha sparc
-	# xpp/xpd_fxs is missing on ppc,sparc
-	%ifnarch ppc sparc
-	%define	modules_xpp xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb}
-	%else
-	%define	modules_xpp xpp/{xpd_fxs,xpp,xpp_usb}
-	%endif
-%else
-%define	modules_xpp %{nil}
+%define	modules_1_2_15  wctc4xxp/wctc4xxp,wcte12xp,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zttranscode
 %endif
 
-%define	modules_wct	wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp
-
-# zttranscode is missing on alpha
-%ifnarch alpha
-%define	modules_zt	ztdummy,ztdynamic,zttranscode
-%else
-%define	modules_zt	ztdummy,ztdynamic
-%endif
-
-%define	modules_1	pciradio,tor2,torisa,wcfxo,wcusb,zaptel,ztd-eth,ztd-loc
-
-%define	modules	%{modules_1},%{modules_wct},%{modules_zt}%{?modules_xpp:,%{modules_xpp}}
+%define	modules		%{modules_1},%{modules_2}%{?modules_1_2_15:,%{modules_1_2_15}}
 
 %description
 Zaptel telephony device driver.
