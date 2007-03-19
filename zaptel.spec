@@ -47,14 +47,27 @@ BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # fails on those archidectures
+# xpp/xpd_fxo is missing on ppc,alpha,sparc
 %ifnarch ppc alpha sparc
-%define	modules_xpp xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb}
+	# xpp/xpd_fxs is missing on ppc,sparc
+	%ifnarch ppc sparc
+	%define	modules_xpp xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb}
+	%else
+	%define	modules_xpp xpp/{xpd_fxs,xpp,xpp_usb}
+	%endif
 %else
-%define	modules_xpp xpp/{xpd_fxs,xpp,xpp_usb}
+%define	modules_xpp xpp/{xpp,xpp_usb}
 %endif
 
 %define	modules_wct	wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp
-%define modules_zt	ztdummy,ztdynamic,zttranscode
+
+# zttranscode is missing on alpha
+%ifnarch alpha
+%define	modules_zt	ztdummy,ztdynamic,zttranscode
+%else
+%define	modules_zt	ztdummy,ztdynamic
+%endif
+
 %define	modules_1	pciradio,tor2,torisa,wcfxo,wcusb,zaptel,ztd-eth,ztd-loc,
 
 %define	modules	%{modules_1},%{modules_wct},%{modules_zt},%{modules_xpp}
