@@ -1,3 +1,6 @@
+# TODO
+# - sparc, ppc fail
+# - zaptel-1.2.15/ztdummy.c:103:2: warning: #warning This module will not be usable since the kernel HZ setting is not 1000 ticks per second.
 #
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
@@ -17,7 +20,7 @@
 #
 %define		_rel	4
 Summary:	Zaptel telephony device support
-Summary(pl.UTF-8):	ObsÅ‚uga urzÄ…dzeÅ„ telefonicznych Zaptel
+Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
 Version:	1.2.15
 Release:	%{_rel}
@@ -43,17 +46,25 @@ BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp,wcusb,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic,zttranscode
+%define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
+%define	modules_2	wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
+
+# modules added in 1.2.15 (see r1.75.2.2)
+%ifnarch ppc alpha sparc
+%define	modules_1_2_15  wctc4xxp/wctc4xxp,wcte12xp,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zttranscode
+%endif
+
+%define	modules		%{modules_1},%{modules_2}%{?modules_1_2_15:,%{modules_1_2_15}}
 
 %description
 Zaptel telephony device driver.
 
-%description -l pl.UTF-8
-Sterownik do urzÄ…dzeÅ„ telefonicznych Zaptel.
+%description -l pl
+Sterownik do urz±dzeñ telefonicznych Zaptel.
 
 %package devel
 Summary:	Zaptel development headers
-Summary(pl.UTF-8):	Pliki nagÅ‚Ã³wkowe Zaptel
+Summary(pl):	Pliki nag³ówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
 # files in /usr/include/linux
@@ -62,23 +73,23 @@ Requires:	linux-libc-headers
 %description devel
 Zaptel development headers.
 
-%description devel -l pl.UTF-8
-Pliki nagÅ‚Ã³wkowe Zaptel.
+%description devel -l pl
+Pliki nag³ówkowe Zaptel.
 
 %package utils
 Summary:	Zaptel utility programs
-Summary(pl.UTF-8):	Programy narzÄ™dziowe Zaptel
+Summary(pl):	Programy narzêdziowe Zaptel
 Group:		Applications/Communications
 
 %description utils
 Zaptel card utility programs, mainly for diagnostics.
 
-%description utils -l pl.UTF-8
-Programy narzÄ™dziowe do kart Zaptel, sÅ‚uÅ¼Ä…ce gÅ‚Ã³wnie do diagnostyki.
+%description utils -l pl
+Programy narzêdziowe do kart Zaptel, s³u¿±ce g³ównie do diagnostyki.
 
 %package init
 Summary:	Zaptel init scripts
-Summary(pl.UTF-8):	Skrypty inicjalizujÄ…ce Zaptel
+Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-utils = %{version}-%{_rel}
@@ -87,12 +98,12 @@ Requires:	rc-scripts
 %description init
 Zaptel boot-time initialization.
 
-%description init -l pl.UTF-8
+%description init -l pl
 Inicjalizacja Zaptel w czasie startu systemu.
 
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Zaptel Linux kernel driver
-Summary(pl.UTF-8):	Sterownik Zaptel dla jÄ…dra Linuksa
+Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
@@ -101,12 +112,12 @@ Requires(post,postun):	/sbin/depmod
 %description -n kernel%{_alt_kernel}-%{name}
 Zaptel telephony Linux kernel driver.
 
-%description -n kernel%{_alt_kernel}-%{name} -l pl.UTF-8
-Sterownik dla jÄ…dra Linuksa do urzÄ…dzeÅ„ telefonicznych Zaptel.
+%description -n kernel%{_alt_kernel}-%{name} -l pl
+Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
 
 %package -n kernel%{_alt_kernel}-smp-%{name}
 Summary:	Zaptel Linux SMP kernel driver
-Summary(pl.UTF-8):	Sterownik Zaptel dla jÄ…dra Linuksa SMP
+Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
@@ -115,8 +126,8 @@ Requires(post,postun):	/sbin/depmod
 %description -n kernel%{_alt_kernel}-smp-%{name}
 Zaptel telephony Linux SMP kernel driver.
 
-%description -n kernel%{_alt_kernel}-smp-%{name} -l pl.UTF-8
-Sterownik dla jÄ…dra Linuksa SMP do urzÄ…dzeÅ„ telefonicznych Zaptel.
+%description -n kernel%{_alt_kernel}-smp-%{name} -l pl
+Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
 %setup -q
@@ -134,6 +145,7 @@ Sterownik dla jÄ…dra Linuksa SMP do urzÄ…dzeÅ„ telefonicznych Zaptel.
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
+echo : {%{modules},}
 %build_kernel_modules SUBDIRS=$PWD -m %{modules}
 %endif
 
@@ -187,6 +199,7 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del %{name}
 fi
 
+%if %{with userspace}
 %files
 %defattr(644,root,root,755)
 %doc README ChangeLog
