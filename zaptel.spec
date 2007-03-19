@@ -48,6 +48,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # fails on those archidectures
 # xpp/xpd_fxo is missing on ppc,alpha,sparc
+# xpp/xpp is missing on ppc,sparc,alpha
 %ifnarch ppc alpha sparc
 	# xpp/xpd_fxs is missing on ppc,sparc
 	%ifnarch ppc sparc
@@ -56,7 +57,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 	%define	modules_xpp xpp/{xpd_fxs,xpp,xpp_usb}
 	%endif
 %else
-%define	modules_xpp xpp/{xpp,xpp_usb}
+%define	modules_xpp xpp/xpp_usb
 %endif
 
 %define	modules_wct	wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp
@@ -68,7 +69,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define	modules_zt	ztdummy,ztdynamic
 %endif
 
-%define	modules_1	pciradio,tor2,torisa,wcfxo,wcusb,zaptel,ztd-eth,ztd-loc,
+%define	modules_1	pciradio,tor2,torisa,wcfxo,wcusb,zaptel,ztd-eth,ztd-loc
 
 %define	modules	%{modules_1},%{modules_wct},%{modules_zt},%{modules_xpp}
 
@@ -161,6 +162,7 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
+echo : {%{modules},}
 %build_kernel_modules SUBDIRS=$PWD -m %{modules}
 %endif
 
