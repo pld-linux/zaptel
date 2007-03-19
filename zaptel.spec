@@ -214,6 +214,7 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del %{name}
 fi
 
+%if %{with userspace}
 %files
 %defattr(644,root,root,755)
 %doc README ChangeLog
