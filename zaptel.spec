@@ -18,7 +18,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	3
+%define		_rel	4
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
@@ -46,7 +46,18 @@ BuildRequires:	newt-devel
 BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp,wcusb,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic,zttranscode
+# fails on those archidectures
+%ifnarch ppc alpha sparc
+%define	modules_xpp xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb}
+%else
+%define	modules_xpp xpp/{xpd_fxs,xpp,xpp_usb}
+%endif
+
+%define	modules_wct	wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp
+%define modules_zt	ztdummy,ztdynamic,zttranscode
+%define	modules_1	pciradio,tor2,torisa,wcfxo,wcusb,zaptel,ztd-eth,ztd-loc,
+
+%define	modules	%{modules_1},%{modules_wct},%{modules_zt},%{modules_xpp}
 
 %description
 Zaptel telephony device driver.
