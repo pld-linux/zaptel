@@ -2,12 +2,7 @@
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	kernel		# don't build kernel modules
-%bcond_without	smp		# don't build SMP module
 %bcond_without	userspace	# don't build userspace tools
-#
-%ifarch sparc
-%undefine	with_smp
-%endif
 #
 %define		_rel 1	
 Summary:	Zaptel telephony device support
@@ -36,8 +31,8 @@ URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
+BuildRequires:  rpmbuild(macros) >= 1.379
 BuildRequires:	newt-devel
-BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -88,28 +83,17 @@ Summary:	Zaptel Linux kernel driver
 Summary(pl.UTF-8):   Sterownik Zaptel dla jądra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_up}
-Requires(post,postun):	/sbin/depmod
+Requires(post,postun):  /sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel
+Requires(postun):       %releq_kernel
+%endif
 
 %description -n kernel-%{name}
 Zaptel telephony Linux kernel driver.
 
 %description -n kernel-%{name} -l pl.UTF-8
 Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
-
-%package -n kernel-smp-%{name}
-Summary:	Zaptel Linux SMP kernel driver
-Summary(pl.UTF-8):   Sterownik Zaptel dla jądra Linuksa SMP
-Release:	%{_rel}@%{_kernel_ver_str}
-Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_smp}
-Requires(post,postun):	/sbin/depmod
-
-%description -n kernel-smp-%{name}
-Zaptel telephony Linux SMP kernel driver.
-
-%description -n kernel-smp-%{name} -l pl.UTF-8
-Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -120,7 +104,7 @@ Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 #%patch4 -p1
 %patch5 -p1
 
-%define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
+%define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
 
 
 %build
@@ -174,15 +158,9 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 for cfg in %{buildconfigs}; do
 	cfgdest=''
-	if [ "$cfg" = "smp" ]; then
-		install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
-		install modules/$cfg/*.ko \
-			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
-	else
-		install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
-		install modules/$cfg/*.ko \
-			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
-	fi
+	install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
+	install modules/$cfg/*.ko \
+		$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
 done
 %endif
 
@@ -207,12 +185,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun -n kernel-%{name}
 %depmod %{_kernel_ver}
-
-%post -n kernel-smp-%{name}
-%depmod %{_kernel_ver}smp
-
-%postun -n kernel-smp-%{name}
-%depmod %{_kernel_ver}smp
 
 %if %{with userspace}
 %post init
@@ -253,10 +225,3 @@ fi
 %files -n kernel-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
-
-%if %{with smp}
-%files -n kernel-smp-%{name}
-%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/misc/*.ko*
-%endif
-%endif
