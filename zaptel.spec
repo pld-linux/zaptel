@@ -2,48 +2,33 @@
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	kernel		# don't build kernel modules
-%bcond_without	up		# don't build UP module
-%bcond_without	smp		# don't build SMP module
 %bcond_without	userspace	# don't build userspace tools
-%bcond_with	grsec_kernel	# build for kernel-grsecurity
 #
-%if %{with kernel} && %{with dist_kernel} && %{with grsec_kernel}
-%define	alt_kernel	grsecurity
-%endif
-#
-%ifarch sparc
-%undefine	with_smp
-%endif
-#
-%define		_rel	4
+%define	_rel	1
 Summary:	Zaptel telephony device support
-Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
+Summary(pl.UTF-8):   Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.15
+Version:	1.4.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	9072603b6e53e89d74973bd254e8285e
+Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
+# Source0-md5:	4e429375161c1d4ec07950e18526ced2
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
+Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
+# Source3-md5:	18e6e6879070a8d61068e1c87b8c2b22
+Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-128-1.05.01.tar.gz
+# Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
 Patch0:		%{name}-make.patch
-Patch1:		%{name}-sparc.patch
-Patch2:		%{name}-LIBDIR.patch
-Patch3:		%{name}-LDFLAGS.patch
-Patch4:		%{name}-as_needed-fix.patch
-Patch5:		%{name}-sangoma.patch
+Patch1:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
-BuildRequires:	kernel%{_alt_kernel}-module-build
+BuildRequires:	kernel-module-build
 %endif
-%if %{with userspace}
+BuildRequires:  rpmbuild(macros) >= 1.379
 BuildRequires:	newt-devel
-%endif
-BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%define	modules pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,wctc4xxp/wctc4xxp,wctdm,wctdm24xxp,wcte11xp,wcte12xp,wcusb,xpp/{xpd_fxo,xpd_fxs,xpp,xpp_usb},zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic,zttranscode
 
 %description
 Zaptel telephony device driver.
@@ -53,11 +38,9 @@ Sterownik do urządzeń telefonicznych Zaptel.
 
 %package devel
 Summary:	Zaptel development headers
-Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
+Summary(pl.UTF-8):   Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
-# files in /usr/include/linux
-Requires:	linux-libc-headers
 
 %description devel
 Zaptel development headers.
@@ -65,9 +48,21 @@ Zaptel development headers.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe Zaptel.
 
+%package static
+Summary:	Zaptel static library
+Summary(pl.UTF-8):   Biblioteka statyczna Zaptel
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{_rel}
+
+%description static
+Zaptel static library.
+
+%description static -l pl.UTF-8
+Biblioteka statyczna Zaptel.
+
 %package utils
 Summary:	Zaptel utility programs
-Summary(pl.UTF-8):	Programy narzędziowe Zaptel
+Summary(pl.UTF-8):   Programy narzędziowe Zaptel
 Group:		Applications/Communications
 
 %description utils
@@ -78,7 +73,7 @@ Programy narzędziowe do kart Zaptel, służące głównie do diagnostyki.
 
 %package init
 Summary:	Zaptel init scripts
-Summary(pl.UTF-8):	Skrypty inicjalizujące Zaptel
+Summary(pl.UTF-8):   Skrypty inicjalizujące Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-utils = %{version}-%{_rel}
@@ -90,56 +85,76 @@ Zaptel boot-time initialization.
 %description init -l pl.UTF-8
 Inicjalizacja Zaptel w czasie startu systemu.
 
-%package -n kernel%{_alt_kernel}-%{name}
+%package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
-Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
+Summary(pl.UTF-8):   Sterownik Zaptel dla jądra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_up}
-Requires(post,postun):	/sbin/depmod
+Requires(post,postun):  /sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel
+Requires(postun):       %releq_kernel
+%endif
 
-%description -n kernel%{_alt_kernel}-%{name}
+%description -n kernel-%{name}
 Zaptel telephony Linux kernel driver.
 
-%description -n kernel%{_alt_kernel}-%{name} -l pl.UTF-8
+%description -n kernel-%{name} -l pl.UTF-8
 Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
-
-%package -n kernel%{_alt_kernel}-smp-%{name}
-Summary:	Zaptel Linux SMP kernel driver
-Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa SMP
-Release:	%{_rel}@%{_kernel_ver_str}
-Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_smp}
-Requires(post,postun):	/sbin/depmod
-
-%description -n kernel%{_alt_kernel}-smp-%{name}
-Zaptel telephony Linux SMP kernel driver.
-
-%description -n kernel%{_alt_kernel}-smp-%{name} -l pl.UTF-8
-Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 
 %prep
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+
+%define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
 
 %build
+%configure
+
 %{__make} prereq zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
-%build_kernel_modules SUBDIRS=$PWD -m %{modules}
+cp %{SOURCE3} firmware/
+cp %{SOURCE4} firmware/
+cd firmware
+for t in *.tar.gz; do
+	tar -xzf $t
+done
+cd ..
+for cfg in %{buildconfigs}; do
+	rm -rf o
+	mkdir -p modules/$cfg
+	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
+		exit 1
+	fi
+	chmod 000 modules
+	install -d o/include/linux
+	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
+	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
+	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
+	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
+	%{__make} -C %{_kernelsrcdir} clean \
+		RCS_FIND_IGNORE="-name '*.ko' -o" \
+		M=$PWD O=$PWD/o \
+		%{?with_verbose:V=1}
+	install -d o/include/config
+	chmod 700 modules
+	%{__make} -C %{_kernelsrcdir} modules \
+		CC="%{__cc}" CPP="%{__cpp}" \
+		M=$PWD O=$PWD/o SUBDIRS=$PWD \
+		DOWNLOAD=wget \
+		%{?with_verbose:V=1}
+	cp *.ko modules/$cfg/
+done
 %endif
 
 %if %{with userspace}
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
-	fxstest fxotune gendigits \
+	fxstest fxotune \
 	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
 %endif
@@ -148,34 +163,37 @@ Sterownik dla jądra Linuksa SMP do urządzeń telefonicznych Zaptel.
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
-%install_kernel_modules -m %{modules} -d misc
+for cfg in %{buildconfigs}; do
+	cfgdest=''
+	install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
+	install modules/$cfg/*.ko \
+		$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
+done
 %endif
 
 %if %{with userspace}
 install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
 %{__make} -o all -o devices install \
 	LIBDIR="%{_libdir}" \
+	LIB_DIR="$RPM_BUILD_ROOT%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
+	DESTDIR=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune gendigits $RPM_BUILD_ROOT%{_sbindir}
+install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
+
+install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel/
 %endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n kernel%{_alt_kernel}-%{name}
+%post -n kernel-%{name}
 %depmod %{_kernel_ver}
 
-%postun -n kernel%{_alt_kernel}-%{name}
+%postun -n kernel-%{name}
 %depmod %{_kernel_ver}
-
-%post -n kernel%{_alt_kernel}-smp-%{name}
-%depmod %{_kernel_ver}smp
-
-%postun -n kernel%{_alt_kernel}-smp-%{name}
-%depmod %{_kernel_ver}smp
 
 %post init
 /sbin/chkconfig --add %{name}
@@ -187,12 +205,14 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del %{name}
 fi
 
+%if %{with userspace}
 %files
 %defattr(644,root,root,755)
-%doc README ChangeLog
+%doc README
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
+%{_datadir}/zaptel
 %{_mandir}/man8/*
 
 %files init
@@ -203,8 +223,12 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
-%{_includedir}/linux/*
-%{_includedir}/*.h
+%{_includedir}/zaptel/
+%{_includedir}/zaptel/*.h
+
+%files static
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/*.a
 
 %files utils
 %defattr(644,root,root,755)
@@ -212,15 +236,7 @@ fi
 %endif
 
 %if %{with kernel}
-%if %{with up} || %{without dist_kernel}
-%files -n kernel%{_alt_kernel}-%{name}
+%files -n kernel-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
-%endif
-
-%if %{with smp} && %{with dist_kernel}
-%files -n kernel%{_alt_kernel}-smp-%{name}
-%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/misc/*.ko*
-%endif
 %endif
