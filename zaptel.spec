@@ -4,17 +4,16 @@
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	userspace	# don't build userspace tools
 #
-%define		_rel 1	
+%define	_rel	1
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):   Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.4.0.2273
+Version:	1.4.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-#Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
-Source0:	%{name}-%{version}.tar.gz
-# Source0-md5:	4d34a4cf755d0178d0559c29d26363b8
+Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
+# Source0-md5:	4e429375161c1d4ec07950e18526ced2
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
@@ -22,11 +21,7 @@ Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114
 Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-128-1.05.01.tar.gz
 # Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
 Patch0:		%{name}-make.patch
-Patch1:		%{name}-sparc.patch
-Patch2:		%{name}-LIBDIR.patch
-Patch3:		%{name}-LDFLAGS.patch
-Patch4:		%{name}-as_needed-fix.patch
-Patch5:		%{name}-sangoma.patch
+Patch1:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -52,6 +47,18 @@ Zaptel development headers.
 
 %description devel -l pl.UTF-8
 Pliki nagłówkowe Zaptel.
+
+%package static
+Summary:	Zaptel static library
+Summary(pl.UTF-8):   Biblioteka statyczna Zaptel
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{_rel}
+
+%description static
+Zaptel static library.
+
+%description static -l pl.UTF-8
+Biblioteka statyczna Zaptel.
 
 %package utils
 Summary:	Zaptel utility programs
@@ -96,16 +103,11 @@ Zaptel telephony Linux kernel driver.
 Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 %patch0 -p1
-#%patch1 -p1
-#%patch2 -p1
-#%patch3 -p1
-#%patch4 -p1
-%patch5 -p1
+%patch1 -p1
 
 %define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
-
 
 %build
 %configure
@@ -118,6 +120,11 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 %if %{with kernel}
 cp %{SOURCE3} firmware/
 cp %{SOURCE4} firmware/
+cd firmware
+for t in *.tar.gz; do
+	tar -xzf $t
+done
+cd ..
 for cfg in %{buildconfigs}; do
 	rm -rf o
 	mkdir -p modules/$cfg
@@ -141,7 +148,7 @@ for cfg in %{buildconfigs}; do
 		M=$PWD O=$PWD/o SUBDIRS=$PWD \
 		DOWNLOAD=wget \
 		%{?with_verbose:V=1}
-	mv *.ko modules/$cfg/
+	cp *.ko modules/$cfg/
 done
 %endif
 
@@ -168,7 +175,9 @@ done
 install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
 %{__make} -o all -o devices install \
 	LIBDIR="%{_libdir}" \
+	LIB_DIR="$RPM_BUILD_ROOT%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
+	DESTDIR=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
 install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
@@ -186,7 +195,6 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n kernel-%{name}
 %depmod %{_kernel_ver}
 
-%if %{with userspace}
 %post init
 /sbin/chkconfig --add %{name}
 %service %{name} restart
@@ -197,12 +205,14 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del %{name}
 fi
 
+%if %{with userspace}
 %files
 %defattr(644,root,root,755)
 %doc README
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
+%{_datadir}/zaptel
 %{_mandir}/man8/*
 
 %files init
@@ -216,6 +226,10 @@ fi
 %{_includedir}/zaptel/
 %{_includedir}/zaptel/*.h
 
+%files static
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/*.a
+
 %files utils
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/*
@@ -225,3 +239,4 @@ fi
 %files -n kernel-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
+%endif
