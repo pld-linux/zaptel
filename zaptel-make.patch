@@ -1,7 +1,16 @@
-diff -urN zaptel-1.4.1.org/Makefile zaptel-1.4.1/Makefile
---- zaptel-1.4.1.org/Makefile	2007-03-23 03:11:12.000000000 +0100
-+++ zaptel-1.4.1/Makefile	2007-04-18 23:05:43.346414984 +0200
-@@ -145,7 +145,7 @@
+diff -ur zaptel-1.4.0.org/Makefile zaptel-1.4.0/Makefile
+--- zaptel-1.4.0/Makefile.orig	2006-12-06 23:25:42.000000000 +0000
++++ zaptel-1.4.0/Makefile	2007-01-02 15:08:07.836737500 +0000
+@@ -31,7 +31,7 @@
+ KVERS_MAJ:=$(shell echo $(KVERS) | cut -d. -f1-2)
+ KINCLUDES:=$(KSRC)/include
+ 
+-CFLAGS+=-I. -O4 -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
++CFLAGS+=-I. $(OPTFLAGS) -g -Wall -DBUILDING_TONEZONE #-DTONEZONE_DRIVER
+ ifneq (,$(findstring ppc,$(UNAME_M)))
+ CFLAGS_PPC:=-fsigned-char
+ endif
+@@ -40,7 +40,7 @@
  endif
  CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_x86_64)
  LCFLAGS=-fPIC $(CFLAGS) -DBUILDING_TONEZONE
@@ -10,21 +19,37 @@ diff -urN zaptel-1.4.1.org/Makefile zaptel-1.4.1/Makefile
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
  	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
  ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
-@@ -212,7 +212,7 @@
- all: menuselect.makeopts 
- 	@$(MAKE) _all
+@@ -370,33 +370,9 @@
+ 	if [ -f zttool ]; then \
+ 		$(INSTALL) -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; \
+ 	fi
+-ifeq ($(BUILDVER),linux26)
+-	for x in $(MODULESKO); do \
+-		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/extra/$$x ; \
+-	done; \
+-	$(KMAKE_INST); \
+-	if [ -f datamods/syncppp.ko ]; then \
+-		$(MAKE) -C datamods install; \
+-	else \
+-		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/{hdlc_*,syncppp}.ko; \
+-	fi
+-else
+-	for x in $(MODULESO) wct4xxp/wct4xxp.o; do \
+-		$(INSTALL) -D -m 644 $$x $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/$$x ; \
+-	done
+-endif
+-	if ! [ -f wcfxsusb.o ]; then \
+-		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxsusb.o; \
+-	fi; \
+-	rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxs.o
+ 	$(INSTALL) -m 644 doc/ztcfg.8 $(INSTALL_PREFIX)/usr/share/man/man8
+ 	$(INSTALL) -m 644 doc/zttool.8 $(INSTALL_PREFIX)/usr/share/man/man8
+-	[ `id -u` = 0 ] && /sbin/depmod -a $(KVERS) || :
+ 	[ -f $(CONFIG_FILE) ] || $(INSTALL) -D -m 644 zaptel.conf.sample $(CONFIG_FILE)
+-	build_tools/genmodconf $(BUILDVER) "$(ROOT_PREFIX)" "$(filter-out zaptel,$(MODULES))"
+-	@if [ -d /etc/modutils ]; then \
+-		/sbin/update-modules ; \
+-	fi
  
--_all: $(if $(BUILD_MODULES),modules) programs $(LTZ_SO) $(LTZ_A)
-+_all: programs $(LTZ_SO) $(LTZ_A)
- 
- xpp-utils:
- ifeq (yes,$(BUILD_XPP))
-@@ -386,7 +386,7 @@
- $(UTILSO): %.o: %.c
- 	$(CC) $(CFLAGS) -o $@ -c $<
- 
--install: all devices install-modules install-libs install-include install-xpp
-+install: all devices install-libs install-include install-xpp
- ifeq ($(HOTPLUG_FIRMWARE),yes)
- 	$(MAKE) -C firmware hotplug-install
- endif
+ install-libs: $(LTZ_SO) $(LTZ_A)
+ 	$(INSTALL) -D -m 755 $(LTZ_A) $(LIB_DIR)/$(LTZ_A)
