@@ -6,7 +6,7 @@
 #
 %define	_rel	1
 Summary:	Zaptel telephony device support
-Summary(pl.UTF-8):   Obsługa urządzeń telefonicznych Zaptel
+Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
 Version:	1.4.1
 Release:	%{_rel}
@@ -26,7 +26,7 @@ URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
 %endif
-BuildRequires:  rpmbuild(macros) >= 1.379
+BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRequires:	newt-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -38,7 +38,7 @@ Sterownik do urządzeń telefonicznych Zaptel.
 
 %package devel
 Summary:	Zaptel development headers
-Summary(pl.UTF-8):   Pliki nagłówkowe Zaptel
+Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
 
@@ -50,7 +50,7 @@ Pliki nagłówkowe Zaptel.
 
 %package static
 Summary:	Zaptel static library
-Summary(pl.UTF-8):   Biblioteka statyczna Zaptel
+Summary(pl.UTF-8):	Biblioteka statyczna Zaptel
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{_rel}
 
@@ -62,7 +62,7 @@ Biblioteka statyczna Zaptel.
 
 %package utils
 Summary:	Zaptel utility programs
-Summary(pl.UTF-8):   Programy narzędziowe Zaptel
+Summary(pl.UTF-8):	Programy narzędziowe Zaptel
 Group:		Applications/Communications
 
 %description utils
@@ -73,7 +73,7 @@ Programy narzędziowe do kart Zaptel, służące głównie do diagnostyki.
 
 %package init
 Summary:	Zaptel init scripts
-Summary(pl.UTF-8):   Skrypty inicjalizujące Zaptel
+Summary(pl.UTF-8):	Skrypty inicjalizujące Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-utils = %{version}-%{_rel}
@@ -87,13 +87,13 @@ Inicjalizacja Zaptel w czasie startu systemu.
 
 %package -n kernel-%{name}
 Summary:	Zaptel Linux kernel driver
-Summary(pl.UTF-8):   Sterownik Zaptel dla jądra Linuksa
+Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-Requires(post,postun):  /sbin/depmod
+Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
 %requires_releq_kernel
-Requires(postun):       %releq_kernel
+Requires(postun):	%releq_kernel
 %endif
 
 %description -n kernel-%{name}
