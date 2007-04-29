@@ -223,8 +223,7 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/*.so
-%{_includedir}/zaptel/
-%{_includedir}/zaptel/*.h
+%{_includedir}/zaptel
 
 %files static
 %defattr(644,root,root,755)
