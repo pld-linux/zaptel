@@ -8,12 +8,12 @@
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.4.1
+Version:	1.4.2.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	4e429375161c1d4ec07950e18526ced2
+# Source0-md5:	42ce771a840ec239abfd945923a98b56
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
