@@ -1,25 +1,26 @@
-diff -Nur zaptel-1.2.7.org/zaptel.c zaptel-1.2.7_/zaptel.c
---- zaptel-1.2.7.org/zaptel.c   2005-12-17 03:04:05.000000000 +0100
-+++ zaptel-1.2.7_/zaptel.c      2006-08-07 15:36:18.487081500 +0200
+diff -Nur zaptel-1.4.2.1.org/zaptel-base.c zaptel-1.4.2.1/zaptel-base.c
+--- zaptel-1.4.2.1.org/zaptel-base.c	2007-04-25 17:36:17.000000000 +0200
++++ zaptel-1.4.2.1/zaptel-base.c	2007-05-03 13:10:43.000000000 +0200
+@@ -1916,6 +1916,11 @@
  		} else {
- 			if (copy_from_user(chan->writebuf[chan->inwritebuf], usrbuf, amnt))
+ 			if (copy_from_user(chan->writebuf[res], usrbuf, amnt))
  				return -EFAULT;
-+                        if ((chan->flags & ZT_FLAG_HDLC) && chan->span->ioctl != NULL){
-+                                if (chan->span->ioctl(chan, ZT_DCHAN_TX_V2, amnt)==0){
-+                                        return amnt;
-+                                }
-+                        }
- 			chan->writen[chan->inwritebuf] = amnt;
++			if ((chan->flags & ZT_FLAG_HDLC) && chan->span->ioctl != NULL){
++				if (chan->span->ioctl(chan, ZT_DCHAN_TX_V2, amnt)==0){
++					return amnt;
++				}
++			}
+ 			chan->writen[res] = amnt;
  		}
- 		chan->writeidx[chan->inwritebuf] = 0;
-diff -Nur zaptel-1.2.7.org/zaptel.h zaptel-1.2.7_/zaptel.h
---- zaptel-1.2.7.org/zaptel.h   2005-12-17 03:04:05.000000000 +0100
-+++ zaptel-1.2.7_/zaptel.h      2006-08-07 15:36:18.479081000 +0200
-@@ -632,6 +632,11 @@
+ 		chan->writeidx[res] = 0;
+diff -Nur zaptel-1.4.2.1.org/zaptel.h zaptel-1.4.2.1/zaptel.h
+--- zaptel-1.4.2.1.org/zaptel.h	2007-04-24 20:32:49.000000000 +0200
++++ zaptel-1.4.2.1/zaptel.h	2007-05-03 13:10:43.000000000 +0200
+@@ -633,6 +633,11 @@
   *  60-80 are reserved for private drivers
   *  80-85 are reserved for dynamic span stuff
   */
-+#define ZT_DCHAN_TX    _IOR (ZT_CODE, 60, int)
++#define ZT_DCHAN_TX 	_IOR (ZT_CODE, 60, int)
 +#define ZT_DCHAN_TX_V1  ZT_DCHAN_TX
 +#define ZT_DCHAN_TX_V2  ZT_DCHAN_TX
 +/*
