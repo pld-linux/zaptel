@@ -3,8 +3,9 @@
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	userspace	# don't build userspace tools
+%bcond_with	oslec		# with Open Source Line Echo Canceller
 #
-%define	_rel	1
+%define	_rel	2
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
@@ -95,6 +96,7 @@ Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
 %requires_releq_kernel
 Requires(postun):	%releq_kernel
+%{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
 %description -n kernel-%{name}
@@ -107,7 +109,7 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+%{?with_oslec:%patch2 -p1}
 
 %define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
 
