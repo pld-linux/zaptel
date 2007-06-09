@@ -8,12 +8,12 @@
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.4.2.1
+Version:	1.4.3
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	42ce771a840ec239abfd945923a98b56
+# Source0-md5:	e00685ff2cd081b63a62a3d9cd9a4c0a
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
@@ -22,6 +22,7 @@ Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114
 # Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sangoma.patch
+Patch2:		%{name}-oslec.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -106,6 +107,7 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
 
