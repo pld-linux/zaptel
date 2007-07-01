@@ -1,14 +1,7 @@
-Common subdirectories: zaptel-1.4.1-orig/build_tools and zaptel-1.4.1/build_tools
-Common subdirectories: zaptel-1.4.1-orig/datamods and zaptel-1.4.1/datamods
-Common subdirectories: zaptel-1.4.1-orig/doc and zaptel-1.4.1/doc
-Common subdirectories: zaptel-1.4.1-orig/firmware and zaptel-1.4.1/firmware
-Common subdirectories: zaptel-1.4.1-orig/hpec and zaptel-1.4.1/hpec
-Common subdirectories: zaptel-1.4.1-orig/menuselect and zaptel-1.4.1/menuselect
-Common subdirectories: zaptel-1.4.1-orig/oct612x and zaptel-1.4.1/oct612x
-diff -uN zaptel-1.4.1-orig/oslec.h zaptel-1.4.1/oslec.h
---- zaptel-1.4.1-orig/oslec.h	1970-01-01 09:30:00.000000000 +0930
-+++ zaptel-1.4.1/oslec.h	2007-04-12 18:04:27.000000000 +0930
-@@ -0,0 +1,28 @@
+diff -Nur zaptel-1.4.3.org/oslec.h zaptel-1.4.3/oslec.h
+--- zaptel-1.4.3.org/oslec.h	1970-01-01 00:00:00.000000000 +0000
++++ zaptel-1.4.3/oslec.h	2007-07-01 15:25:59.376524352 +0000
+@@ -0,0 +1,29 @@
 +/*
 +  oslec.h
 +  David Rowe
@@ -18,6 +11,7 @@ diff -uN zaptel-1.4.1-orig/oslec.h zaptel-1.4.1/oslec.h
 +*/
 +
 +#ifndef __OSLEC__
++#define __OSLEC__
 +
 +struct echo_can_state {
 +  void *ec;
@@ -37,9 +31,9 @@ diff -uN zaptel-1.4.1-orig/oslec.h zaptel-1.4.1/oslec.h
 +
 +#endif
 +
-diff -uN zaptel-1.4.1-orig/version.h zaptel-1.4.1/version.h
---- zaptel-1.4.1-orig/version.h	1970-01-01 09:30:00.000000000 +0930
-+++ zaptel-1.4.1/version.h	2007-04-12 17:45:03.000000000 +0930
+diff -Nur zaptel-1.4.3.org/version.h zaptel-1.4.3/version.h
+--- zaptel-1.4.3.org/version.h	1970-01-01 00:00:00.000000000 +0000
++++ zaptel-1.4.3/version.h	2007-07-01 15:25:59.376524352 +0000
 @@ -0,0 +1,6 @@
 +/*
 + * version.h 
@@ -47,25 +41,9 @@ diff -uN zaptel-1.4.1-orig/version.h zaptel-1.4.1/version.h
 + */
 +#define ZAPTEL_VERSION "1.4.1"
 +
-Common subdirectories: zaptel-1.4.1-orig/wct4xxp and zaptel-1.4.1/wct4xxp
-Common subdirectories: zaptel-1.4.1-orig/wctc4xxp and zaptel-1.4.1/wctc4xxp
-Common subdirectories: zaptel-1.4.1-orig/xpp and zaptel-1.4.1/xpp
-diff -uN zaptel-1.4.1-orig/zconfig.h zaptel-1.4.1/zconfig.h
---- zaptel-1.4.1-orig/zconfig.h	2006-11-30 08:57:20.000000000 +1030
-+++ zaptel-1.4.1/zconfig.h	2007-04-12 17:45:09.000000000 +0930
-@@ -63,7 +63,8 @@
- /* #define ECHO_CAN_MARK3 */
- /* #define ECHO_CAN_KB1 */
- /* This is the new latest and greatest */
--#define ECHO_CAN_MG2
-+/* #define ECHO_CAN_MG2 */
-+#define ECHO_CAN_OSLEC
- 
- /*
-  * Uncomment for aggressive residual echo suppression under 
-diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
---- zaptel-1.4.1-orig/zaptel-base.c	2007-03-23 12:13:26.000000000 +1030
-+++ zaptel-1.4.1/zaptel-base.c	2007-04-20 10:56:42.000000000 +0930
+diff -Nur zaptel-1.4.3.org/zaptel-base.c zaptel-1.4.3/zaptel-base.c
+--- zaptel-1.4.3.org/zaptel-base.c	2007-07-01 15:25:19.914823416 +0000
++++ zaptel-1.4.3/zaptel-base.c	2007-07-01 15:24:53.000000000 +0000
 @@ -426,6 +426,14 @@
  #include "mg2ec.h"
  #elif defined(ECHO_CAN_JP1)
@@ -81,7 +59,15 @@ diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
  #else
  #include "mec3.h"
  #endif
-@@ -5751,6 +5759,69 @@
+@@ -4985,6 +4993,7 @@
+ 		}
+ 	}
+ #endif
++
+ 	if ((!ms->confmute && !ms->dialing) || (ms->flags & ZT_FLAG_PSEUDO)) {
+ 		/* Handle conferencing on non-clear channel and non-HDLC channels */
+ 		switch(ms->confmode & ZT_CONF_MODE_MASK) {
+@@ -5751,6 +5760,69 @@
  	chan->rxsig = cursig;
  	spin_unlock_irqrestore(&chan->lock, flags);
  }
@@ -151,7 +137,7 @@ diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
  
  static inline void __zt_ec_chunk(struct zt_chan *ss, unsigned char *rxchunk, const unsigned char *txchunk)
  {
-@@ -5802,7 +5873,9 @@
+@@ -5802,7 +5874,9 @@
  #if !defined(ZT_EC_ARRAY_UPDATE)
  			for (x=0;x<ZT_CHUNKSIZE;x++) {
  				rxlin = ZT_XLAW(rxchunk[x], ss);
@@ -161,7 +147,7 @@ diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
  				rxchunk[x] = ZT_LIN2X((int) rxlin, ss);
  			}
  #else /* defined(ZT_EC_ARRAY_UPDATE) */
-@@ -6680,6 +6753,8 @@
+@@ -6680,6 +6754,8 @@
  static void __zt_transmit_chunk(struct zt_chan *chan, unsigned char *buf)
  {
  	unsigned char silly[ZT_CHUNKSIZE];
@@ -170,7 +156,7 @@ diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
  	/* Called with chan->lock locked */
  	if (!buf)
  		buf = silly;
-@@ -6694,10 +6769,126 @@
+@@ -6694,10 +6770,126 @@
  		kernel_fpu_end();
  #endif
  	}
@@ -297,22 +283,23 @@ diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
  	/* Called with chan->lock held */
  	if (chan->confmode) {
  		/* Pull queued data off the conference */
-@@ -6705,6 +6896,14 @@
+@@ -6705,6 +6897,15 @@
  	} else {
  		__zt_transmit_chunk(chan, chan->writechunk);
  	}
 +
++        // return, if no echo canceler have been allocated.
++	if (!chan->ec) return;
 +	/* hook to allow HPF filtering of audio leaving tx (D/A) port */
 +	for (x=0;x<ZT_CHUNKSIZE;x++) {
 +	  txlin = ZT_XLAW(chan->writechunk[x], chan);
 +	  txlin = oslec_hpf_tx(chan->ec, txlin);
 +	  chan->writechunk[x] = ZT_LIN2X((int)txlin, chan);
 +	}
-+		
  }
  
  static void __zt_getempty(struct zt_chan *ms, unsigned char *buf)
-@@ -7171,12 +7370,27 @@
+@@ -7171,12 +7372,27 @@
  #ifdef CONFIG_ZAPTEL_WATCHDOG
  	watchdog_init();
  #endif	
@@ -340,3 +327,16 @@ diff -uN zaptel-1.4.1-orig/zaptel-base.c zaptel-1.4.1/zaptel-base.c
  #ifdef CONFIG_PROC_FS
  	remove_proc_entry("zaptel", NULL);
  #endif
+diff -Nur zaptel-1.4.3.org/zconfig.h zaptel-1.4.3/zconfig.h
+--- zaptel-1.4.3.org/zconfig.h	2007-04-24 18:32:49.000000000 +0000
++++ zaptel-1.4.3/zconfig.h	2007-07-01 15:25:59.380524524 +0000
+@@ -63,7 +63,8 @@
+ /* #define ECHO_CAN_MARK3 */
+ /* #define ECHO_CAN_KB1 */
+ /* This is the new latest and greatest */
+-#define ECHO_CAN_MG2
++/* #define ECHO_CAN_MG2 */
++#define ECHO_CAN_OSLEC
+ 
+ /*
+  * This is only technically an "echo canceller"...
