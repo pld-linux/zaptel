@@ -14,17 +14,17 @@ diff -urN zaptel-1.4.1.org/Makefile zaptel-1.4.1/Makefile
  all: menuselect.makeopts 
  	@$(MAKE) _all
  
--_all: $(if $(BUILD_MODULES),modules) programs $(LTZ_SO) $(LTZ_A)
-+_all: programs $(LTZ_SO) $(LTZ_A)
+-_all: $(if $(BUILD_MODULES),modules) programs
++_all: programs
  
- xpp-utils:
- ifeq (yes,$(BUILD_XPP))
+ libs: $(LTZ_SO) $(LTZ_A)
+ 
 @@ -386,7 +386,7 @@
  $(UTILSO): %.o: %.c
  	$(CC) $(CFLAGS) -o $@ -c $<
  
--install: all devices install-modules install-libs install-include install-xpp
-+install: all devices install-libs install-include install-xpp
- ifeq ($(HOTPLUG_FIRMWARE),yes)
- 	$(MAKE) -C firmware hotplug-install
- endif
+-install: all devices install-modules install-programs firmware
++install: all devices install-programs firmware
+ 	@echo "###################################################"
+ 	@echo "###"
+ 	@echo "### Zaptel installed successfully."
