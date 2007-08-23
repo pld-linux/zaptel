@@ -5,31 +5,37 @@
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 #
-%define	_rel	2
+%define	_rel	1
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.4.3
+Version:	1.4.5.1
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	e00685ff2cd081b63a62a3d9cd9a4c0a
+# Source0-md5:	796b9fae005ab77eec8e3ce9153f1092
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
 # Source3-md5:	18e6e6879070a8d61068e1c87b8c2b22
 Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-128-1.05.01.tar.gz
 # Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
+Source5:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-tc400m-MR5.6.tar.gz
+# Source5-md5:	ec5c96f7508bfb0e0b8be768ea5f3aa2
+Source6:	http://downloads.digium.com/pub/telephony/firmware/releases/zaptel-fw-vpmadt032-1.07.tar.gz
+# Source6-md5:	7916c630a68fcfd38ead6caf9b55e5a1
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sangoma.patch
 Patch2:		%{name}-oslec.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
+BuildRequires:	module-init-tools
 %endif
-BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRequires:	newt-devel
+BuildRequires:	perl-base
+BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -119,11 +125,14 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 %{__make} prereq zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
-	OPTFLAGS="%{rpmcflags}"
+	OPTFLAGS="%{rpmcflags}" \
+	KSRC=%{_kernelsrcdir}
 
 %if %{with kernel}
-cp %{SOURCE3} firmware/
-cp %{SOURCE4} firmware/
+cp %{SOURCE3} firmware
+cp %{SOURCE4} firmware
+cp %{SOURCE5} firmware
+cp %{SOURCE6} firmware
 cd firmware
 for t in *.tar.gz; do
 	tar -xzf $t
@@ -144,14 +153,16 @@ for cfg in %{buildconfigs}; do
 	%{__make} -C %{_kernelsrcdir} clean \
 		RCS_FIND_IGNORE="-name '*.ko' -o" \
 		M=$PWD O=$PWD/o \
-		%{?with_verbose:V=1}
+		%{?with_verbose:V=1} \
+		KSRC=%{_kernelsrcdir}
 	install -d o/include/config
 	chmod 700 modules
 	%{__make} -C %{_kernelsrcdir} modules \
 		CC="%{__cc}" CPP="%{__cpp}" \
 		M=$PWD O=$PWD/o SUBDIRS=$PWD \
 		DOWNLOAD=wget \
-		%{?with_verbose:V=1}
+		%{?with_verbose:V=1} \
+		KSRC=%{_kernelsrcdir}
 	cp *.ko modules/$cfg/
 done
 %endif
@@ -160,7 +171,8 @@ done
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
 	fxstest fxotune \
 	CC="%{__cc} %{rpmcflags}" \
-	LDFLAGS="%{rpmldflags}"
+	LDFLAGS="%{rpmldflags}" \
+	KSRC=%{_kernelsrcdir}
 %endif
 
 %install
@@ -179,13 +191,15 @@ done
 install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
 %{__make} -o all -o devices install \
 	LIBDIR="%{_libdir}" \
-	LIB_DIR="$RPM_BUILD_ROOT%{_libdir}" \
+	LIB_DIR="%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	DESTDIR=$RPM_BUILD_ROOT \
-	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
+	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf \
+	KSRC=%{_kernelsrcdir}
 install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
+touch $RPM_BUILD_ROOT/etc/zaptel.conf
 
 install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel/
 %endif
