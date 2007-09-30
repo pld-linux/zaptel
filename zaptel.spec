@@ -18,7 +18,7 @@
 %undefine	with_smp
 %endif
 #
-%define		_rel	53
+%define		_rel	53.1
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
