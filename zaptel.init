@@ -21,6 +21,7 @@ start() {
 		for mod in $ZAP_MODULES; do
 			modprobe $mod
 		done
+		sleep 2
 		/sbin/ztcfg
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/zaptel
