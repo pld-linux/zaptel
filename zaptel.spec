@@ -10,14 +10,18 @@
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	grsec_kernel	# build for kernel-grsecurity
 #
-%if %{with kernel} && %{with dist_kernel} && %{with grsec_kernel}
-%define	alt_kernel	grsecurity
-%endif
-#
 %ifarch sparc
 %undefine	with_smp
 %endif
 #
+%if %{without kernel}
+%undefine	with_dist_kernel
+%endif
+#
+%if %{with kernel} && %{with dist_kernel} && %{with grsec_kernel}
+%define	alt_kernel	grsecurity
+%endif
+
 %define		_rel	55
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
@@ -37,13 +41,13 @@ Patch3:		%{name}-LDFLAGS.patch
 Patch4:		%{name}-as_needed-fix.patch
 Patch5:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
-%if %{with kernel} && %{with dist_kernel}
-BuildRequires:	kernel%{_alt_kernel}-module-build
+%if %{with kernel}
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build}
+BuildRequires:	rpmbuild(macros) >= 1.330
 %endif
 %if %{with userspace}
 BuildRequires:	newt-devel
 %endif
-BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
