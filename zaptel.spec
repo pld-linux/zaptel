@@ -24,22 +24,20 @@
 %undefine	with_userspace
 %endif
 
-%define		_rel	55
+%define		_rel	1
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		zaptel
-Version:	1.2.17
+Version:	1.2.21
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	ftp://ftp.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
-# Source0-md5:	6b7cc8c8254c3101bf7b63d155fbb6fb
+Source0:	http://downloads.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
+# Source0-md5:	262186d4749adbbabc5b96a0d1c3c70e
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sparc.patch
-Patch2:		%{name}-LIBDIR.patch
-Patch3:		%{name}-LDFLAGS.patch
 Patch4:		%{name}-as_needed-fix.patch
 Patch5:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
@@ -53,7 +51,7 @@ BuildRequires:	newt-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
-%define	modules_2	wctdm,wctdm24xxp,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
+%define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
 
 # modules added in 1.2.15 (see r1.75.2.2)
 %ifnarch ppc alpha sparc
@@ -139,8 +137,6 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 
@@ -171,11 +167,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{with userspace}
 install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
-%{__make} -o all -o devices install \
+%{__make} -o all -o devices -o modules install \
 	LIBDIR="%{_libdir}" \
-	INSTALL_PREFIX=$RPM_BUILD_ROOT \
+	DESTDIR=$RPM_BUILD_ROOT \
+	KMAKE_INST= \
+	SBINDIR=%{_sbindir} \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune gendigits $RPM_BUILD_ROOT%{_sbindir}
+install makefw fxstest gendigits $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %endif
@@ -210,7 +208,7 @@ fi
 %defattr(644,root,root,755)
 %doc README ChangeLog
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
-%attr(755,root,root) /sbin/*
+%attr(755,root,root) %{_sbindir}/ztcfg
 %attr(755,root,root) %{_libdir}/*.so.*
 %{_mandir}/man8/*
 
@@ -227,7 +225,14 @@ fi
 
 %files utils
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/*
+%attr(755,root,root) %{_sbindir}/fxotune
+%attr(755,root,root) %{_sbindir}/fxstest
+%attr(755,root,root) %{_sbindir}/gendigits
+%attr(755,root,root) %{_sbindir}/makefw
+%attr(755,root,root) %{_sbindir}/torisatool
+%attr(755,root,root) %{_sbindir}/ztmonitor
+%attr(755,root,root) %{_sbindir}/ztspeed
+%attr(755,root,root) %{_sbindir}/zttest
 %endif
 
 %if %{with kernel}
