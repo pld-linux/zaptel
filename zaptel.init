@@ -21,7 +21,7 @@ start() {
 		for mod in $ZAP_MODULES; do
 			modprobe $mod
 		done
-		/sbin/ztcfg
+		/usr/sbin/ztcfg
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/zaptel
 		ok
@@ -66,7 +66,7 @@ case "$1" in
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/zaptel ]; then
-		/sbin/ztcfg
+		/usr/sbin/ztcfg
 		RETVAL=$?
 	else
 		msg_not_running zaptel
