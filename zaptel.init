@@ -13,10 +13,7 @@
 # Get service config
 [ -f /etc/sysconfig/zaptel ] && . /etc/sysconfig/zaptel
 
-RETVAL=0
-# See how we were called.
-case "$1" in
-  start)
+start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/zaptel ]; then
 		msg_starting zaptel
@@ -24,15 +21,16 @@ case "$1" in
 		for mod in $ZAP_MODULES; do
 			modprobe $mod
 		done
-		/sbin/ztcfg
+		/usr/sbin/ztcfg
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/zaptel
 		ok
 	else
 		msg_already_running zaptel
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/zaptel ]; then
 		msg_stopping zaptel
@@ -48,17 +46,27 @@ case "$1" in
 	else
 		msg_not_running zaptel
 	fi
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
 	;;
   status)
 	RETVAL=0
 	;;
   restart)
-  	$0 stop
-	$0 start
+  	stop
+	start
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/zaptel ]; then
-		/sbin/ztcfg
+		/usr/sbin/ztcfg
 		RETVAL=$?
 	else
 		msg_not_running zaptel
