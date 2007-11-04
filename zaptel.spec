@@ -25,21 +25,22 @@
 %endif
 
 %define		_rel	2
+%define		pname	zaptel
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
-Name:		zaptel
+Name:		%{pname}%{_alt_kernel}
 Version:	1.2.21
 Release:	%{_rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	http://downloads.digium.com/pub/zaptel/%{name}-%{version}.tar.gz
+Source0:	http://downloads.digium.com/pub/zaptel/%{pname}-%{version}.tar.gz
 # Source0-md5:	262186d4749adbbabc5b96a0d1c3c70e
-Source1:	%{name}.init
-Source2:	%{name}.sysconfig
-Patch0:		%{name}-make.patch
-Patch1:		%{name}-sparc.patch
-Patch2:		%{name}-as_needed-fix.patch
-Patch3:		%{name}-sangoma.patch
+Source1:	%{pname}.init
+Source2:	%{pname}.sysconfig
+Patch0:		%{pname}-make.patch
+Patch1:		%{pname}-sparc.patch
+Patch2:		%{pname}-as_needed-fix.patch
+Patch3:		%{pname}-sangoma.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build}
@@ -70,7 +71,7 @@ Sterownik do urz±dzeñ telefonicznych Zaptel.
 Summary:	Zaptel development headers
 Summary(pl):	Pliki nag³ówkowe Zaptel
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{_rel}
+Requires:	%{pname} = %{version}-%{_rel}
 # files in /usr/include/linux
 Requires:	linux-libc-headers
 
@@ -96,7 +97,7 @@ Summary:	Zaptel init scripts
 Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
-Requires:	%{name}-utils = %{version}-%{_rel}
+Requires:	%{pname}-utils = %{version}-%{_rel}
 Requires:	rc-scripts
 
 %description init
@@ -105,7 +106,7 @@ Zaptel boot-time initialization.
 %description init -l pl
 Inicjalizacja Zaptel w czasie startu systemu.
 
-%package -n kernel%{_alt_kernel}-%{name}
+%package -n kernel%{_alt_kernel}-%{pname}
 Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -113,13 +114,13 @@ Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
 
-%description -n kernel%{_alt_kernel}-%{name}
+%description -n kernel%{_alt_kernel}-%{pname}
 Zaptel telephony Linux kernel driver.
 
-%description -n kernel%{_alt_kernel}-%{name} -l pl
+%description -n kernel%{_alt_kernel}-%{pname} -l pl
 Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
 
-%package -n kernel%{_alt_kernel}-smp-%{name}
+%package -n kernel%{_alt_kernel}-smp-%{pname}
 Summary:	Zaptel Linux SMP kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -127,14 +128,14 @@ Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
-%description -n kernel%{_alt_kernel}-smp-%{name}
+%description -n kernel%{_alt_kernel}-smp-%{pname}
 Zaptel telephony Linux SMP kernel driver.
 
-%description -n kernel%{_alt_kernel}-smp-%{name} -l pl
+%description -n kernel%{_alt_kernel}-smp-%{pname} -l pl
 Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
-%setup -q
+%setup -q -n %{pname}-%{version}
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1
@@ -181,26 +182,26 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n kernel%{_alt_kernel}-%{name}
+%post -n kernel%{_alt_kernel}-%{pname}
 %depmod %{_kernel_ver}
 
-%postun -n kernel%{_alt_kernel}-%{name}
+%postun -n kernel%{_alt_kernel}-%{pname}
 %depmod %{_kernel_ver}
 
-%post -n kernel%{_alt_kernel}-smp-%{name}
+%post -n kernel%{_alt_kernel}-smp-%{pname}
 %depmod %{_kernel_ver}smp
 
-%postun -n kernel%{_alt_kernel}-smp-%{name}
+%postun -n kernel%{_alt_kernel}-smp-%{pname}
 %depmod %{_kernel_ver}smp
 
 %post init
-/sbin/chkconfig --add %{name}
-%service %{name} restart
+/sbin/chkconfig --add %{pname}
+%service %{pname} restart
 
 %preun init
 if [ "$1" = "0" ]; then
-	%service %{name} stop
-	/sbin/chkconfig --del %{name}
+	%service %{pname} stop
+	/sbin/chkconfig --del %{pname}
 fi
 
 %if %{with userspace}
@@ -238,13 +239,13 @@ fi
 
 %if %{with kernel}
 %if %{with up} || %{without dist_kernel}
-%files -n kernel%{_alt_kernel}-%{name}
+%files -n kernel%{_alt_kernel}-%{pname}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 %endif
 
 %if %{with smp} && %{with dist_kernel}
-%files -n kernel%{_alt_kernel}-smp-%{name}
+%files -n kernel%{_alt_kernel}-smp-%{pname}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
 %endif
