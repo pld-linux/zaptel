@@ -9,53 +9,21 @@
  #MODULES+=wcfxsusb
  ifeq ($(BUILDVER),linux26)
  MODULES+=ztdummy zttranscode
-@@ -93,12 +93,12 @@
+@@ -108,7 +108,7 @@
  
- INSTALL_PREFIX:=$(DESTDIR)
+ INSTALL_PREFIX	:= /usr
  
--CFLAGS+=-I. -O4 -g -Wall
-+CFLAGS+=-I. $(OPTFLAGS) -g -Wall
- CFLAGS_PPC:=$(shell if uname -m | grep -q ppc; then echo "-fsigned-char"; fi)
- CFLAGS_X86-64:=$(shell if uname -m | grep -q x86_64; then echo "-m64"; fi)
- CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_X86-64)
- LCFLAGS:=-fPIC $(CFLAGS) -DBUILDING_TONEZONE
+-CFLAGS+=-I. -O4 -g -fPIC -Wall
++CFLAGS+=-I. $(OPTFLAGS) -g -fPIC -Wall
+ ifneq (,$(findstring ppc,$(MACHINE)))
+   CFLAGS	+= -fsigned-char
+   KFLAGS	+= -msoft-float -fsigned-char
+@@ -117,7 +117,7 @@
+   CFLAGS	+= -m64
+   KFLAGS	+= -mcmodel=kernel
+ endif
 -KFLAGS:=-I$(KINCLUDES) -O6
 +KFLAGS:=-I$(KINCLUDES) $(OPTFLAGS)
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
  	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
  ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
-@@ -353,21 +353,6 @@
- 		install -D -m 755 sethdlc $(INSTALL_PREFIX)/sbin/sethdlc ; \
- 	fi
- 	if [ -f zttool ]; then install -D -m 755 zttool $(INSTALL_PREFIX)/sbin/zttool; fi
--ifeq ($(BUILDVER),linux26)
--	for x in $(MODULESKO); do \
--		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/extra/$$x ; \
--	done; \
--	$(KMAKE_INST);
--else
--	for x in $(MODULESO) wct4xxp/wct4xxp.o; do \
--		install -D -m 644 $$x $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/$$x ; \
--	done;
--
--endif
--	if ! [ -f wcfxsusb.o ]; then \
--		rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxsusb.o; \
--	fi; \
--	rm -f $(INSTALL_PREFIX)/lib/modules/$(KVERS)/misc/wcfxs.o
- 	install -D -m 755 $(LIBTONEZONE_SO) $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER)
- 	[ `id -u` = 0 ] && /sbin/ldconfig || :
- 	rm -f $(INSTALL_PREFIX)/usr/lib/$(LIBTONEZONE_SO)
-@@ -381,12 +366,7 @@
- 	install -D -m 644 tonezone.h $(INSTALL_PREFIX)/usr/include/tonezone.h
- 	install -m 644 doc/ztcfg.8 $(INSTALL_PREFIX)/usr/share/man/man8
- 	install -m 644 doc/zttool.8 $(INSTALL_PREFIX)/usr/share/man/man8
--	[ `id -u` = 0 ] && /sbin/depmod -a $(KVERS) || :
- 	[ -f $(CONFIG_FILE) ] || install -D -m 644 zaptel.conf.sample $(CONFIG_FILE)
--	build_tools/genmodconf $(BUILDVER) "$(INSTALL_PREFIX)" "$(filter-out zaptel ztdummy zttranscode wctc4xxp ztdynamic xpp_usb,$(MODULES)) $(MODULE_ALIASES)"
--	@if [ -d /etc/modutils ]; then \
--		/sbin/update-modules ; \
--	fi
- 
- install-udev: devices
- 
