@@ -38,8 +38,8 @@ Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sparc.patch
-Patch4:		%{name}-as_needed-fix.patch
-Patch5:		%{name}-sangoma.patch
+Patch2:		%{name}-as_needed-fix.patch
+Patch3:		%{name}-sangoma.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build}
@@ -135,15 +135,15 @@ Sterownik dla j±dra Linuksa SMP do urz±dzeñ telefonicznych Zaptel.
 
 %prep
 %setup -q
-%patch0 -p1
+#%patch0 -p1
 %patch1 -p1
-%patch4 -p1
-%patch5 -p1
+#%patch2 -p1
+%patch3 -p1
 
 %build
 %{__make} prereq zttest \
 	CC="%{__cc}" \
-	LDFLAGS="%{rpmldflags}" \
+	LDFLAGS="%{rpmldflags} -lm" \
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
@@ -155,7 +155,7 @@ echo : {%{modules},}
 %{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
 	fxstest fxotune gendigits \
 	CC="%{__cc} %{rpmcflags}" \
-	LDFLAGS="%{rpmldflags}"
+	LDFLAGS="%{rpmldflags} -lm"
 %endif
 
 %install
@@ -209,6 +209,7 @@ fi
 %doc README ChangeLog
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) %{_sbindir}/ztcfg
+%attr(755,root,root) %{_sbindir}/zttool
 %attr(755,root,root) %{_libdir}/*.so.*
 %{_mandir}/man8/*
 
