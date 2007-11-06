@@ -24,7 +24,7 @@
 %undefine	with_userspace
 %endif
 
-%define		_rel	3
+%define		_rel	4
 %define		pname	zaptel
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
