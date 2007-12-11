@@ -1,11 +1,18 @@
 #
+# TODO:
+# Installed (but unpackaged) file(s) found:
+#   /etc/hotplug/usb/xpp_fxloader
+#   /etc/hotplug/usb/xpp_fxloader.usermap
+#   /etc/udev/rules.d/xpp.rules
+#
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	oslec		# with Open Source Line Echo Canceller
+%bcond_with	bristuff	# with bristuff support
 #
-%define	_rel	5
+%define	_rel	6
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
@@ -28,6 +35,7 @@ Source6:	http://downloads.digium.com/pub/telephony/firmware/releases/zaptel-fw-v
 Patch0:		%{name}-make.patch
 Patch1:		%{name}-sangoma.patch
 Patch2:		%{name}-oslec.patch
+Patch3:		%{name}-bristuff.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -36,6 +44,7 @@ BuildRequires:	module-init-tools
 BuildRequires:	newt-devel
 BuildRequires:	perl-base
 BuildRequires:	rpmbuild(macros) >= 1.379
+%{?with_bristuff:Provides:	zaptel(bristuff)}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -49,6 +58,7 @@ Summary:	Zaptel development headers
 Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{_rel}
+%{?with_bristuff:Provides:	zaptel-devel(bristuff)}
 
 %description devel
 Zaptel development headers.
@@ -61,6 +71,7 @@ Summary:	Zaptel static library
 Summary(pl.UTF-8):	Biblioteka statyczna Zaptel
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{_rel}
+%{?with_bristuff:Provides:	zaptel-static(bristuff)}
 
 %description static
 Zaptel static library.
@@ -93,7 +104,7 @@ Zaptel boot-time initialization.
 %description init -l pl.UTF-8
 Inicjalizacja Zaptel w czasie startu systemu.
 
-%package -n kernel-%{name}
+%package -n kernel%{_alt_kernel}-%{name}
 Summary:	Zaptel Linux kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
@@ -105,17 +116,30 @@ Requires(postun):	%releq_kernel
 %{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
-%description -n kernel-%{name}
+%description -n kernel%{_alt_kernel}-%{name}
 Zaptel telephony Linux kernel driver.
 
-%description -n kernel-%{name} -l pl.UTF-8
+%description -n kernel%{_alt_kernel}-%{name} -l pl.UTF-8
 Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
+
+%package -n perl-Zaptel
+Summary:	Perl interface to Zaptel
+Summary(pl.UTF-8):	Perlowy interfejs do Zaptel-a
+Group:		Development/Languages/Perl
+Requires:	%{name} = %{version}-%{release}
+
+%description -n perl-Zaptel
+Perl inferface to Zaptel
+
+%description -n perl-Zaptel -l pl.UTF-8
+Perlowy interfejs do Zaptel-a
 
 %prep
 %setup -q
 %patch0 -p1
 %patch1 -p1
 %{?with_oslec:%patch2 -p1}
+%{?with_bristuff:%patch3 -p1}
 
 %define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
 
@@ -168,7 +192,7 @@ done
 %endif
 
 %if %{with userspace}
-%{__make} ztcfg torisatool makefw ztmonitor ztspeed libtonezone.so \
+%{__make} ztcfg torisatool makefw ztmonitor ztspeed %{?with_bristuff:ztpty} libtonezone.so \
 	fxstest fxotune \
 	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
@@ -189,14 +213,15 @@ done
 
 %if %{with userspace}
 install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfig},%{_sbindir},%{_mandir}/{man1,man8}}
-%{__make} -o all -o devices install \
+%{__make} -o all -o devices -j1 install \
 	LIBDIR="%{_libdir}" \
 	LIB_DIR="%{_libdir}" \
 	INSTALL_PREFIX=$RPM_BUILD_ROOT \
 	DESTDIR=$RPM_BUILD_ROOT \
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf \
-	KSRC=%{_kernelsrcdir}
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune $RPM_BUILD_ROOT%{_sbindir}
+	KSRC=%{_kernelsrcdir} \
+	PERLLIBDIR=%{perl_vendorlib}
+install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune %{?with_bristuff:ztpty} $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 touch $RPM_BUILD_ROOT/etc/zaptel.conf
@@ -207,10 +232,10 @@ install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n kernel-%{name}
+%post -n kernel%{_alt_kernel}-%{name}
 %depmod %{_kernel_ver}
 
-%postun -n kernel-%{name}
+%postun -n kernel%{_alt_kernel}-%{name}
 %depmod %{_kernel_ver}
 
 %post init
@@ -253,7 +278,12 @@ fi
 %endif
 
 %if %{with kernel}
-%files -n kernel-%{name}
+%files -n kernel%{_alt_kernel}-%{name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 %endif
+
+%files -n perl-Zaptel
+%defattr(644,root,root,755)
+%{perl_vendorlib}/Zaptel
+%{perl_vendorlib}/Zaptel.pm
