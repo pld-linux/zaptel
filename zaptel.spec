@@ -12,7 +12,7 @@
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
 #
-%define	_rel	6
+%define	_rel	7
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
