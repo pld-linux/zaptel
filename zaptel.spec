@@ -1,5 +1,6 @@
 #
 # TODO:
+# - update to kernel macros
 # Installed (but unpackaged) file(s) found:
 #   /etc/hotplug/usb/xpp_fxloader
 #   /etc/hotplug/usb/xpp_fxloader.usermap
@@ -12,12 +13,12 @@
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
 #
-%define	_rel	8
+%define		rel	9
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
 Version:	1.4.5.1
-Release:	%{_rel}
+Release:	%{rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
@@ -57,7 +58,7 @@ Sterownik do urządzeń telefonicznych Zaptel.
 Summary:	Zaptel development headers
 Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{_rel}
+Requires:	%{name} = %{version}-%{rel}
 %{?with_bristuff:Provides:	zaptel-devel(bristuff)}
 
 %description devel
@@ -70,7 +71,7 @@ Pliki nagłówkowe Zaptel.
 Summary:	Zaptel static library
 Summary(pl.UTF-8):	Biblioteka statyczna Zaptel
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{_rel}
+Requires:	%{name}-devel = %{version}-%{rel}
 %{?with_bristuff:Provides:	zaptel-static(bristuff)}
 
 %description static
@@ -95,7 +96,7 @@ Summary:	Zaptel init scripts
 Summary(pl.UTF-8):	Skrypty inicjalizujące Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
-Requires:	%{name}-utils = %{version}-%{_rel}
+Requires:	%{name}-utils = %{version}-%{rel}
 Requires:	rc-scripts
 
 %description init
@@ -107,7 +108,7 @@ Inicjalizacja Zaptel w czasie startu systemu.
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Zaptel Linux kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
@@ -126,7 +127,7 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 Summary:	Perl interface to Zaptel
 Summary(pl.UTF-8):	Perlowy interfejs do Zaptel-a
 Group:		Development/Languages/Perl
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{version}-%{rel}
 
 %description -n perl-Zaptel
 Perl inferface to Zaptel
