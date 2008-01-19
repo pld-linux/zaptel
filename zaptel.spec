@@ -125,15 +125,15 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 
 %package -n perl-Zaptel
 Summary:	Perl interface to Zaptel
-Summary(pl.UTF-8):	Perlowy interfejs do Zaptel-a
+Summary(pl.UTF-8):	Perlowy interfejs do Zaptela
 Group:		Development/Languages/Perl
 Requires:	%{name} = %{version}-%{rel}
 
 %description -n perl-Zaptel
-Perl inferface to Zaptel
+Perl inferface to Zaptel.
 
 %description -n perl-Zaptel -l pl.UTF-8
-Perlowy interfejs do Zaptel-a
+Perlowy interfejs do Zaptela.
 
 %prep
 %setup -q
