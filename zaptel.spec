@@ -44,6 +44,7 @@ BuildRequires:	module-init-tools
 %endif
 BuildRequires:	newt-devel
 BuildRequires:	perl-base
+BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.379
 %{?with_bristuff:Provides:	zaptel(bristuff)}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
