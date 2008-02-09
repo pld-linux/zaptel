@@ -1,15 +1,15 @@
 diff -burN zaptel-1.4.5.1.orig/Makefile zaptel-1.4.5.1/Makefile
 --- zaptel-1.4.5.1.orig/Makefile	2007-12-04 09:47:55.000000000 +0100
 +++ zaptel-1.4.5.1/Makefile	2007-12-04 10:02:46.000000000 +0100
-@@ -248,7 +248,7 @@
+@@ -255,7 +255,7 @@
  
  UTILSO		= $(UTILS:%=%.o)
  
--BINS:=fxotune fxstest sethdlc-new ztcfg ztdiag ztmonitor ztspeed zttest zttool
-+BINS:=fxotune fxstest sethdlc-new ztcfg ztdiag ztmonitor ztspeed zttest zttool ztpty
- BINS:=$(filter-out $(MENUSELECT_UTILS),$(BINS))
- MAN_PAGES:=$(wildcard $(BINS:%=doc/%.8))
- 
+-BINS:=fxotune fxstest sethdlc-new ztcfg ztdiag ztmonitor ztspeed zttest ztscan
++BINS:=fxotune fxstest sethdlc-new ztcfg ztdiag ztmonitor ztspeed zttest ztscan ztpty
+ ifeq (1,$(PBX_LIBNEWT))
+   BINS+=zttool
+ endif
 @@ -332,6 +332,9 @@
  
  ztmonitor.o: ztmonitor.c zaptel.h
