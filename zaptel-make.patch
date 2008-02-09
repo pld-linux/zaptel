@@ -1,10 +1,10 @@
 diff -urN zaptel-1.4.1.org/Makefile zaptel-1.4.1/Makefile
 --- zaptel-1.4.1.org/Makefile	2007-03-23 03:11:12.000000000 +0100
 +++ zaptel-1.4.1/Makefile	2007-04-18 23:05:43.346414984 +0200
-@@ -145,7 +145,7 @@
+@@ -154,7 +154,7 @@
+ CFLAGS_x86_64:=-m64
  endif
  CFLAGS+=$(CFLAGS_PPC) $(CFLAGS_x86_64)
- LCFLAGS=-fPIC $(CFLAGS) -DBUILDING_TONEZONE
 -KFLAGS=-I$(KINCLUDES) -O6
 +KFLAGS=-I$(KINCLUDES) $(OPTFLAGS)
  KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
@@ -19,12 +19,13 @@ diff -urN zaptel-1.4.1.org/Makefile zaptel-1.4.1/Makefile
  
  libs: $(LTZ_SO) $(LTZ_A)
  
-@@ -386,7 +386,7 @@
+@@ -446,7 +446,7 @@
  $(UTILSO): %.o: %.c
  	$(CC) $(CFLAGS) -o $@ -c $<
  
--install: all devices install-modules install-programs firmware
-+install: all devices install-programs firmware
+-install: all devices install-modules install-programs install-firmware
++install: all devices install-programs install-firmware
  	@echo "###################################################"
  	@echo "###"
  	@echo "### Zaptel installed successfully."
+

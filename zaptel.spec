@@ -13,16 +13,16 @@
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
 #
-%define		rel	10
+%define		rel	1
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		zaptel
-Version:	1.4.5.1
+Version:	1.4.8
 Release:	%{rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	796b9fae005ab77eec8e3ce9153f1092
+# Source0-md5:	f57e1ba86a3dd4ef141ca3831e11c076
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
