@@ -186,9 +186,10 @@ for cfg in %{buildconfigs}; do
 		CC="%{__cc}" CPP="%{__cpp}" \
 		M=$PWD O=$PWD/o SUBDIRS=$PWD \
 		DOWNLOAD=wget \
+		ZAP="-I$(pwd)" \
 		%{?with_verbose:V=1} \
 		KSRC=%{_kernelsrcdir}
-	cp *.ko modules/$cfg/
+	cp *.ko %{?with_bristuff:*/*.ko} modules/$cfg/
 done
 %endif
 
