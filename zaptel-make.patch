@@ -1,0 +1,29 @@
+--- zaptel-1.2.15.orig/Makefile	2007-03-02 23:29:04.000000000 +0100
++++ zaptel-1.2.15/Makefile	2007-03-08 11:11:05.212766000 +0100
+@@ -52,7 +52,7 @@
+ 
+ MODULES:=zaptel tor2 torisa wcusb wcfxo wctdm wctdm24xxp \
+ 	 ztdynamic ztd-eth wct1xxp wcte11xp pciradio \
+-         ztd-loc wcte12xp # ztdummy
++         ztd-loc wcte12xp ztdummy
+ #MODULES+=wcfxsusb
+ ifeq ($(BUILDVER),linux26)
+ MODULES+=ztdummy zttranscode
+@@ -108,7 +108,7 @@
+ 
+ INSTALL_PREFIX	:= /usr
+ 
+-CFLAGS+=-I. -O4 -g -fPIC -Wall
++CFLAGS+=-I. $(OPTFLAGS) -g -fPIC -Wall
+ ifneq (,$(findstring ppc,$(MACHINE)))
+   CFLAGS	+= -fsigned-char
+   KFLAGS	+= -msoft-float -fsigned-char
+@@ -117,7 +117,7 @@
+   CFLAGS	+= -m64
+   KFLAGS	+= -mcmodel=kernel
+ endif
+-KFLAGS:=-I$(KINCLUDES) -O6
++KFLAGS:=-I$(KINCLUDES) $(OPTFLAGS)
+ KFLAGS+=-DMODULE -D__KERNEL__ -DEXPORT_SYMTAB -I$(KSRC)/drivers/net \
+ 	-Wall -I. -Wstrict-prototypes -fomit-frame-pointer -I$(KSRC)/drivers/net/wan -I$(KINCLUDES)/net
+ ifneq (,$(wildcard $(KINCLUDES)/linux/modversions.h))
