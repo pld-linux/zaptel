@@ -8,7 +8,6 @@
 %bcond_without	up		# don't build UP module
 %bcond_without	smp		# don't build SMP module
 %bcond_without	userspace	# don't build userspace tools
-%bcond_with	grsec_kernel	# build for kernel-grsecurity
 
 %ifarch sparc
 %undefine	with_smp
@@ -17,20 +16,16 @@
 %if %{without kernel}
 %undefine	with_dist_kernel
 %endif
-%if %{with kernel} && %{with dist_kernel} && %{with grsec_kernel}
-%define	alt_kernel	grsecurity
-%endif
 %if "%{_alt_kernel}" != "%{nil}"
 %undefine	with_userspace
 %endif
 
-%define		_rel	8
 %define		pname	zaptel
 Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
 Version:	1.2.21
-Release:	%{_rel}
+Release:	9
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://downloads.digium.com/pub/zaptel/%{pname}-%{version}.tar.gz
@@ -71,7 +66,7 @@ Sterownik do urz±dzeñ telefonicznych Zaptel.
 Summary:	Zaptel development headers
 Summary(pl):	Pliki nag³ówkowe Zaptel
 Group:		Development/Libraries
-Requires:	%{pname} = %{version}-%{_rel}
+Requires:	%{pname} = %{version}-%{release}
 # files in /usr/include/linux
 Requires:	linux-libc-headers
 
@@ -97,7 +92,7 @@ Summary:	Zaptel init scripts
 Summary(pl):	Skrypty inicjalizuj±ce Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
-Requires:	%{pname}-utils = %{version}-%{_rel}
+Requires:	%{pname}-utils = %{version}-%{release}
 Requires:	rc-scripts
 
 %description init
@@ -109,9 +104,8 @@ Inicjalizacja Zaptel w czasie startu systemu.
 %package -n kernel%{_alt_kernel}-%{pname}
 Summary:	Zaptel Linux kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa
-Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_up}
+%{?with_dist_kernel:Requires:	kernel%{_alt_kernel}(vermagic) = %{_kernel_ver}}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel%{_alt_kernel}-%{pname}
@@ -123,9 +117,8 @@ Sterownik dla j±dra Linuksa do urz±dzeñ telefonicznych Zaptel.
 %package -n kernel%{_alt_kernel}-smp-%{pname}
 Summary:	Zaptel Linux SMP kernel driver
 Summary(pl):	Sterownik Zaptel dla j±dra Linuksa SMP
-Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_smp}
+%{?with_dist_kernel:Requires:	kernel%{_alt_kernel}-smp(vermagic) = %{_kernel_ver}}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel%{_alt_kernel}-smp-%{pname}
