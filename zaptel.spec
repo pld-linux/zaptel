@@ -25,7 +25,7 @@ Summary:	Zaptel telephony device support
 Summary(pl):	Obs³uga urz±dzeñ telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
 Version:	1.2.21
-Release:	9
+Release:	11
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://downloads.digium.com/pub/zaptel/%{pname}-%{version}.tar.gz
