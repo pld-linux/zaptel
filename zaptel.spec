@@ -12,19 +12,31 @@
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
-#
+
+%ifarch sparc
+%undefine	with_smp
+%endif
+
+%if %{without kernel}
+%undefine	with_dist_kernel
+%endif
+%if "%{_alt_kernel}" != "%{nil}"
+%undefine	with_userspace
+%endif
+
 %define		rel	4
+%define		pname	zaptel
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
-Name:		zaptel
+Name:		%{pname}%{_alt_kernel}
 Version:	1.4.8
 Release:	%{rel}
 License:	GPL
 Group:		Base/Kernel
-Source0:	http://ftp.digium.com/pub/zaptel/releases/%{name}-%{version}.tar.gz
+Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
 # Source0-md5:	f57e1ba86a3dd4ef141ca3831e11c076
-Source1:	%{name}.init
-Source2:	%{name}.sysconfig
+Source1:	%{pname}.init
+Source2:	%{pname}.sysconfig
 Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
 # Source3-md5:	18e6e6879070a8d61068e1c87b8c2b22
 Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-128-1.05.01.tar.gz
@@ -33,10 +45,10 @@ Source5:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-tc400m-
 # Source5-md5:	ec5c96f7508bfb0e0b8be768ea5f3aa2
 Source6:	http://downloads.digium.com/pub/telephony/firmware/releases/zaptel-fw-vpmadt032-1.07.tar.gz
 # Source6-md5:	7916c630a68fcfd38ead6caf9b55e5a1
-Patch0:		%{name}-make.patch
-Patch1:		%{name}-sangoma.patch
-Patch2:		%{name}-oslec.patch
-Patch3:		%{name}-bristuff.patch
+Patch0:		%{pname}-make.patch
+Patch1:		%{pname}-sangoma.patch
+Patch2:		%{pname}-oslec.patch
+Patch3:		%{pname}-bristuff.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -59,7 +71,7 @@ Sterownik do urządzeń telefonicznych Zaptel.
 Summary:	Zaptel development headers
 Summary(pl.UTF-8):	Pliki nagłówkowe Zaptel
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{rel}
+Requires:	%{pname} = %{version}-%{rel}
 %{?with_bristuff:Provides:	zaptel-devel(bristuff)}
 
 %description devel
@@ -72,7 +84,7 @@ Pliki nagłówkowe Zaptel.
 Summary:	Zaptel static library
 Summary(pl.UTF-8):	Biblioteka statyczna Zaptel
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{rel}
+Requires:	%{pname}-devel = %{version}-%{rel}
 %{?with_bristuff:Provides:	zaptel-static(bristuff)}
 
 %description static
@@ -97,7 +109,7 @@ Summary:	Zaptel init scripts
 Summary(pl.UTF-8):	Skrypty inicjalizujące Zaptel
 Group:		Applications/Communications
 Requires(post,preun):	/sbin/chkconfig
-Requires:	%{name}-utils = %{version}-%{rel}
+Requires:	%{pname}-utils = %{version}-%{rel}
 Requires:	rc-scripts
 
 %description init
@@ -106,7 +118,7 @@ Zaptel boot-time initialization.
 %description init -l pl.UTF-8
 Inicjalizacja Zaptel w czasie startu systemu.
 
-%package -n kernel%{_alt_kernel}-%{name}
+%package -n kernel%{_alt_kernel}-%{pname}
 Summary:	Zaptel Linux kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
 Release:	%{rel}@%{_kernel_ver_str}
@@ -118,17 +130,17 @@ Requires(postun):	%releq_kernel
 %{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
-%description -n kernel%{_alt_kernel}-%{name}
+%description -n kernel%{_alt_kernel}-%{pname}
 Zaptel telephony Linux kernel driver.
 
-%description -n kernel%{_alt_kernel}-%{name} -l pl.UTF-8
+%description -n kernel%{_alt_kernel}-%{pname} -l pl.UTF-8
 Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 
 %package -n perl-Zaptel
 Summary:	Perl interface to Zaptel
 Summary(pl.UTF-8):	Perlowy interfejs do Zaptela
 Group:		Development/Languages/Perl
-Requires:	%{name} = %{version}-%{rel}
+Requires:	%{pname} = %{version}-%{rel}
 
 %description -n perl-Zaptel
 Perl inferface to Zaptel.
@@ -137,7 +149,7 @@ Perl inferface to Zaptel.
 Perlowy interfejs do Zaptela.
 
 %prep
-%setup -q
+%setup -q -n %{pname}-%{version}
 %patch0 -p1
 %patch1 -p1
 %{?with_oslec:%patch2 -p1}
@@ -235,20 +247,20 @@ install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n kernel%{_alt_kernel}-%{name}
+%post -n kernel%{_alt_kernel}-%{pname}
 %depmod %{_kernel_ver}
 
-%postun -n kernel%{_alt_kernel}-%{name}
+%postun -n kernel%{_alt_kernel}-%{pname}
 %depmod %{_kernel_ver}
 
 %post init
-/sbin/chkconfig --add %{name}
-%service %{name} restart
+/sbin/chkconfig --add %{pname}
+%service %{pname} restart
 
 %preun init
 if [ "$1" = "0" ]; then
-	%service %{name} stop
-	/sbin/chkconfig --del %{name}
+	%service %{pname} stop
+	/sbin/chkconfig --del %{pname}
 fi
 
 %if %{with userspace}
@@ -281,7 +293,7 @@ fi
 %endif
 
 %if %{with kernel}
-%files -n kernel%{_alt_kernel}-%{name}
+%files -n kernel%{_alt_kernel}-%{pname}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 %endif
