@@ -22,10 +22,9 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	4.1
+%define		rel	5
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
-
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
@@ -41,12 +40,10 @@ Source3:	%{FIRMWARE_URL}/zaptel-fw-oct6114-064-1.05.01.tar.gz
 # Source3-md5:	18e6e6879070a8d61068e1c87b8c2b22
 Source4:	%{FIRMWARE_URL}/zaptel-fw-oct6114-128-1.05.01.tar.gz
 # Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
-Source5:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR5.6.tar.gz
-# Source5-md5:	ec5c96f7508bfb0e0b8be768ea5f3aa2
-Source6:	%{FIRMWARE_URL}/zaptel-fw-vpmadt032-1.07.tar.gz
-# Source6-md5:	7916c630a68fcfd38ead6caf9b55e5a1
-Source7:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR6.12.tar.gz
-# Source7-md5:	c57f41fae88f129e14fcaf41e4df90dc
+Source5:	%{FIRMWARE_URL}/zaptel-fw-vpmadt032-1.07.tar.gz
+# Source5-md5:	7916c630a68fcfd38ead6caf9b55e5a1
+Source6:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR6.12.tar.gz
+# Source6-md5:	c57f41fae88f129e14fcaf41e4df90dc
 Patch0:		%{pname}-make.patch
 Patch1:		%{pname}-sangoma.patch
 Patch2:		%{pname}-oslec.patch
@@ -66,6 +63,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
 %define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
 %define	modules		%{modules_1},%{modules_2}
+
+%if %{without userspace}
+# nothing to be placed to debuginfo package
+%define		_enable_debug_packages	0
+%endif
 
 %description
 Zaptel telephony device driver.
@@ -162,7 +164,7 @@ Perlowy interfejs do Zaptela.
 %{?with_bristuff:%patch3 -p1}
 
 %if %{with kernel}
-for a in  %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6} %{SOURCE7}; do
+for a in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6}; do
 	ln -s $a firmware
 	tar -C firmware -xzf $a
 done
@@ -176,13 +178,11 @@ chmod a+rx download-logger
 %endif
 
 %build
-%if %{with userspace}
 %configure
 %{__make} prereq zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
 	OPTFLAGS="%{rpmcflags}"
-%endif
 
 %if %{with kernel}
 %build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
