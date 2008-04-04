@@ -134,9 +134,8 @@ Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
 Release:	%{rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
+%{?with_dist_kernel:Requires:	kernel%{_alt_kernel}(vermagic) = %{_kernel_ver}}
 %if %{with dist_kernel}
-%requires_releq_kernel
-Requires(postun):	%releq_kernel
 %{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
