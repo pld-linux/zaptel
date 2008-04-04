@@ -268,7 +268,9 @@ fi
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
+%if %{with xpp}
 %{_datadir}/zaptel
+%endif
 %{_mandir}/man8/*
 
 %files init
