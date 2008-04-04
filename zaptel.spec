@@ -136,7 +136,7 @@ Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %{?with_dist_kernel:Requires:	kernel%{_alt_kernel}(vermagic) = %{_kernel_ver}}
 %if %{with dist_kernel}
-%{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
+%{?with_oslec:Requires:	kernel%{_alt_kernel}-misc-oslec(vermagic) = %{_kernel_ver}}
 %endif
 
 %description -n kernel%{_alt_kernel}-%{pname}
