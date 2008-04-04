@@ -1,5 +1,4 @@
 # TODO:
-# - download files to df not let it download with wget
 # Installed (but unpackaged) file(s) found:
 #   /etc/hotplug/usb/xpp_fxloader
 #   /etc/hotplug/usb/xpp_fxloader.usermap
@@ -25,6 +24,8 @@
 
 %define		rel	4.1
 %define		pname	zaptel
+%define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
+
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
@@ -36,14 +37,16 @@ Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
 # Source0-md5:	f57e1ba86a3dd4ef141ca3831e11c076
 Source1:	%{pname}.init
 Source2:	%{pname}.sysconfig
-Source3:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-064-1.05.01.tar.gz
+Source3:	%{FIRMWARE_URL}/zaptel-fw-oct6114-064-1.05.01.tar.gz
 # Source3-md5:	18e6e6879070a8d61068e1c87b8c2b22
-Source4:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-oct6114-128-1.05.01.tar.gz
+Source4:	%{FIRMWARE_URL}/zaptel-fw-oct6114-128-1.05.01.tar.gz
 # Source4-md5:	c46a13f468b53828dc5c78f0eadbefd4
-Source5:	http://ftp.digium.com/pub/telephony/firmware/releases/zaptel-fw-tc400m-MR5.6.tar.gz
+Source5:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR5.6.tar.gz
 # Source5-md5:	ec5c96f7508bfb0e0b8be768ea5f3aa2
-Source6:	http://downloads.digium.com/pub/telephony/firmware/releases/zaptel-fw-vpmadt032-1.07.tar.gz
+Source6:	%{FIRMWARE_URL}/zaptel-fw-vpmadt032-1.07.tar.gz
 # Source6-md5:	7916c630a68fcfd38ead6caf9b55e5a1
+Source7:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR6.12.tar.gz
+# Source7-md5:	c57f41fae88f129e14fcaf41e4df90dc
 Patch0:		%{pname}-make.patch
 Patch1:		%{pname}-sangoma.patch
 Patch2:		%{pname}-oslec.patch
@@ -159,10 +162,17 @@ Perlowy interfejs do Zaptela.
 %{?with_bristuff:%patch3 -p1}
 
 %if %{with kernel}
-tar -C firmware -xzf %{SOURCE3}
-tar -C firmware -xzf %{SOURCE4}
-tar -C firmware -xzf %{SOURCE5}
-tar -C firmware -xzf %{SOURCE6}
+for a in  %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6} %{SOURCE7}; do
+	ln -s $a firmware
+	tar -C firmware -xzf $a
+done
+
+cat > download-logger <<'EOF'
+#!/bin/sh
+# keep log of files make wanted to download in firmware/ dir
+echo "$@" >> download.log
+EOF
+chmod a+rx download-logger
 %endif
 
 %build
@@ -175,7 +185,7 @@ tar -C firmware -xzf %{SOURCE6}
 %endif
 
 %if %{with kernel}
-%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=wget ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
+%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
 %endif
 
 %if %{with userspace}
