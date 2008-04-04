@@ -65,7 +65,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %ifnarch alpha
 %define	modules_nalpha	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}
 %endif
-%define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}
+%if %{with bristuff}
+%define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,xpp/xpd_bri,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
+%endif
+%define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}%{?modules_bristuff:,%{modules_bristuff}}
 
 %if %{without userspace}
 # nothing to be placed to debuginfo package
