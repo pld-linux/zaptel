@@ -62,7 +62,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
 %define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
-%define	modules		%{modules_1},%{modules_2}
+%define	modules_3	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,wcte12xp/wcte12xp,zttranscode
+%define	modules_4	xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}
+%define	modules		%{modules_1},%{modules_2},%{modules_3},%{modules_4}
 
 %if %{without userspace}
 # nothing to be placed to debuginfo package
@@ -186,6 +188,18 @@ chmod a+rx download-logger
 
 %if %{with kernel}
 %build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
+
+check_modules() {
+	err=0
+	for a in {*/,}*.ko; do
+		[[ $a = *-dist.ko ]] && continue
+		echo >&2 "unpackaged module: ${a%.ko}"
+		err=1
+	done
+
+	[ $err = 0 ] || exit 1
+}
+check_modules
 %endif
 
 %if %{with userspace}
