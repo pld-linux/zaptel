@@ -1,6 +1,5 @@
-#
 # TODO:
-# - update to kernel macros
+# - download files to df not let it download with wget
 # Installed (but unpackaged) file(s) found:
 #   /etc/hotplug/usb/xpp_fxloader
 #   /etc/hotplug/usb/xpp_fxloader.usermap
@@ -24,7 +23,7 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	4
+%define		rel	4.1
 %define		pname	zaptel
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
@@ -60,6 +59,10 @@ BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.379
 %{?with_bristuff:Provides:	zaptel(bristuff)}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
+%define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
+%define	modules		%{modules_1},%{modules_2}
 
 %description
 Zaptel telephony device driver.
@@ -155,55 +158,24 @@ Perlowy interfejs do Zaptela.
 %{?with_oslec:%patch2 -p1}
 %{?with_bristuff:%patch3 -p1}
 
-%define buildconfigs %{?with_dist_kernel:dist}%{!?with_dist_kernel:nondist}
+%if %{with kernel}
+tar -C firmware -xzf %{SOURCE3}
+tar -C firmware -xzf %{SOURCE4}
+tar -C firmware -xzf %{SOURCE5}
+tar -C firmware -xzf %{SOURCE6}
+%endif
 
 %build
+%if %{with userspace}
 %configure
-
 %{__make} prereq zttest \
 	CC="%{__cc}" \
 	LDFLAGS="%{rpmldflags}" \
-	OPTFLAGS="%{rpmcflags}" \
-	KSRC=%{_kernelsrcdir}
+	OPTFLAGS="%{rpmcflags}"
+%endif
 
 %if %{with kernel}
-cp %{SOURCE3} firmware
-cp %{SOURCE4} firmware
-cp %{SOURCE5} firmware
-cp %{SOURCE6} firmware
-cd firmware
-for t in *.tar.gz; do
-	tar -xzf $t
-done
-cd ..
-for cfg in %{buildconfigs}; do
-	rm -rf o
-	mkdir -p modules/$cfg
-	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
-		exit 1
-	fi
-	chmod 000 modules
-	install -d o/include/linux
-	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
-	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
-	%{__make} -C %{_kernelsrcdir} clean \
-		RCS_FIND_IGNORE="-name '*.ko' -o" \
-		M=$PWD O=$PWD/o \
-		%{?with_verbose:V=1} \
-		KSRC=%{_kernelsrcdir}
-	install -d o/include/config
-	chmod 700 modules
-	%{__make} -C %{_kernelsrcdir} modules \
-		CC="%{__cc}" CPP="%{__cpp}" \
-		M=$PWD O=$PWD/o SUBDIRS=$PWD \
-		DOWNLOAD=wget \
-		ZAP="-I$(pwd)" \
-		%{?with_verbose:V=1} \
-		KSRC=%{_kernelsrcdir}
-	cp *.ko %{?with_bristuff:*/*.ko} modules/$cfg/
-done
+%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=wget ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
 %endif
 
 %if %{with userspace}
@@ -218,12 +190,7 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
-for cfg in %{buildconfigs}; do
-	cfgdest=''
-	install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
-	install modules/$cfg/*.ko \
-		$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
-done
+%install_kernel_modules -m %{modules} -d misc
 %endif
 
 %if %{with userspace}
@@ -290,6 +257,11 @@ fi
 %files utils
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/*
+
+%files -n perl-Zaptel
+%defattr(644,root,root,755)
+%{perl_vendorlib}/Zaptel
+%{perl_vendorlib}/Zaptel.pm
 %endif
 
 %if %{with kernel}
@@ -297,8 +269,3 @@ fi
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 %endif
-
-%files -n perl-Zaptel
-%defattr(644,root,root,755)
-%{perl_vendorlib}/Zaptel
-%{perl_vendorlib}/Zaptel.pm
