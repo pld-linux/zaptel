@@ -61,10 +61,11 @@ BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
-%define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
-%define	modules_3	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,wcte12xp/wcte12xp,zttranscode
-%define	modules_4	xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}
-%define	modules		%{modules_1},%{modules_2},%{modules_3},%{modules_4}
+%define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic,wcte12xp/wcte12xp
+%ifnarch alpha
+%define	modules_nalpha	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}
+%endif
+%define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}
 
 %if %{without userspace}
 # nothing to be placed to debuginfo package
