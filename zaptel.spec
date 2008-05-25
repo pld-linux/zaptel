@@ -1,5 +1,8 @@
+#
 # TODO:
-# Installed (but unpackaged) file(s) found:
+# - kernel modules doesn't build
+# - should more header files be installed?
+# - Installed (but unpackaged) file(s) found:
 #   /etc/hotplug/usb/xpp_fxloader
 #   /etc/hotplug/usb/xpp_fxloader.usermap
 #   /etc/udev/rules.d/xpp.rules
@@ -22,18 +25,18 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	6
+%define		rel	0.1
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
-Version:	1.4.8
+Version:	1.4.10.1
 Release:	%{rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
-# Source0-md5:	f57e1ba86a3dd4ef141ca3831e11c076
+# Source0-md5:	120fdcbfeab8cce9918baf4c4225e974
 Source1:	%{pname}.init
 Source2:	%{pname}.sysconfig
 Source3:	%{FIRMWARE_URL}/zaptel-fw-oct6114-064-1.05.01.tar.gz
@@ -187,7 +190,7 @@ chmod a+rx download-logger
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
-%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
+%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules} -C kernel
 
 check_modules() {
 	err=0
@@ -203,8 +206,9 @@ check_modules
 %endif
 
 %if %{with userspace}
-%{__make} ztcfg torisatool makefw ztmonitor ztspeed %{?with_bristuff:ztpty} libtonezone.so \
-	fxstest fxotune \
+%{__make} zttool zttest ztmonitor ztspeed sethdlc-new ztcfg \
+	ztcfg-dude fxstest fxotune ztdiag torisatool \
+	%{?with_bristuff:ztpty} libtonezone.so \
 	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
 	KSRC=%{_kernelsrcdir}
@@ -227,12 +231,12 @@ install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfi
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf \
 	KSRC=%{_kernelsrcdir} \
 	PERLLIBDIR=%{perl_vendorlib}
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune %{?with_bristuff:ztpty} $RPM_BUILD_ROOT%{_sbindir}
+install zttool zttest ztmonitor ztspeed sethdlc-new ztcfg ztcfg-dude fxstest fxotune ztdiag torisatool %{?with_bristuff:ztpty} $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 touch $RPM_BUILD_ROOT/etc/zaptel.conf
 
-install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel/
+install kernel/{zconfig.h,ecdis.h,fasthdlc.h,biquad.h} $RPM_BUILD_ROOT/usr/include/zaptel/
 %endif
 
 %clean
