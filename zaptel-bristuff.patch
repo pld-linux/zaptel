@@ -16558,9 +16558,9 @@ diff -urN zaptel-1.4.8.org/zaphfc/zaptel.conf zaptel-1.4.8/zaphfc/zaptel.conf
 +span=1,1,3,ccs,ami
 +bchan=1-2
 +dchan=3
-diff -urN zaptel-1.4.8.org/zaptel-base.c zaptel-1.4.8/zaptel-base.c
---- zaptel-1.4.8.org/zaptel-base.c	2008-01-12 05:07:30.000000000 +0100
-+++ zaptel-1.4.8/zaptel-base.c	2008-02-09 17:57:33.978583652 +0100
+diff -urN zaptel-1.4.8.org/kernel/zaptel-base.c zaptel-1.4.8/zaptel-base.c
+--- zaptel-1.4.8.org/kernel/zaptel-base.c	2008-01-12 05:07:30.000000000 +0100
++++ zaptel-1.4.8/kernel/zaptel-base.c	2008-02-09 17:57:33.978583652 +0100
 @@ -136,6 +136,7 @@
  EXPORT_SYMBOL(zt_qevent_lock);
  EXPORT_SYMBOL(zt_hooksig);
@@ -16718,9 +16718,9 @@ diff -urN zaptel-1.4.8.org/zaptel-base.c zaptel-1.4.8/zaptel-base.c
  			} else {
  				/* Not HDLC */
  				memcpy(buf + ms->readidx[ms->inreadbuf], rxb, left);
-diff -urN zaptel-1.4.8.org/zaptel.h zaptel-1.4.8/zaptel.h
---- zaptel-1.4.8.org/zaptel.h	2008-01-09 18:17:07.000000000 +0100
-+++ zaptel-1.4.8/zaptel.h	2008-02-09 17:57:33.961916185 +0100
+diff -urN zaptel-1.4.8.org/kernel/zaptel.h zaptel-1.4.8/zaptel.h
+--- zaptel-1.4.8.org/kernel/zaptel.h	2008-01-09 18:17:07.000000000 +0100
++++ zaptel-1.4.8/kernel/zaptel.h	2008-02-09 17:57:33.961916185 +0100
 @@ -1266,6 +1266,13 @@
  	int do_ppp_error;
  	struct sk_buff_head ppp_rq;
@@ -16767,9 +16767,9 @@ diff -urN zaptel-1.4.8.org/zaptel.h zaptel-1.4.8/zaptel.h
  /* Initialize a tone state */
  void zt_init_tone_state(struct zt_tone_state *ts, struct zt_tone *zt);
  
-diff -urN zaptel-1.4.8.org/zconfig.h zaptel-1.4.8/zconfig.h
---- zaptel-1.4.8.org/zconfig.h	2008-01-11 22:35:18.000000000 +0100
-+++ zaptel-1.4.8/zconfig.h	2008-02-09 17:57:07.433977978 +0100
+diff -urN zaptel-1.4.8.org/kernel/zconfig.h zaptel-1.4.8/zconfig.h
+--- zaptel-1.4.8.org/kernel/zconfig.h	2008-01-11 22:35:18.000000000 +0100
++++ zaptel-1.4.8/kernel/zconfig.h	2008-02-09 17:57:07.433977978 +0100
 @@ -189,4 +189,10 @@
   */
  #define ZAPTEL_SYNC_TICK
