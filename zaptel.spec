@@ -31,12 +31,12 @@
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
-Version:	1.4.10.1
+Version:	1.4.11
 Release:	%{rel}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
-# Source0-md5:	120fdcbfeab8cce9918baf4c4225e974
+# Source0-md5:	894d548d180fddf360de1c0426a68bac
 Source1:	%{pname}.init
 Source2:	%{pname}.sysconfig
 Source3:	%{FIRMWARE_URL}/zaptel-fw-oct6114-064-1.05.01.tar.gz
@@ -48,9 +48,8 @@ Source5:	%{FIRMWARE_URL}/zaptel-fw-vpmadt032-1.07.tar.gz
 Source6:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR6.12.tar.gz
 # Source6-md5:	c57f41fae88f129e14fcaf41e4df90dc
 Patch0:		%{pname}-make.patch
-Patch1:		%{pname}-sangoma.patch
-Patch2:		%{pname}-oslec.patch
-Patch3:		%{pname}-bristuff.patch
+Patch1:		%{pname}-oslec.patch
+Patch2:		%{pname}-bristuff.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel-module-build
@@ -164,9 +163,8 @@ Perlowy interfejs do Zaptela.
 %prep
 %setup -q -n %{pname}-%{version}
 %patch0 -p1
-%patch1 -p1
-%{?with_oslec:%patch2 -p1}
-%{?with_bristuff:%patch3 -p1}
+%{?with_oslec:%patch1 -p1}
+%{?with_bristuff:%patch2 -p1}
 
 %if %{with kernel}
 for a in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6}; do
@@ -190,7 +188,11 @@ chmod a+rx download-logger
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
-%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules} -C kernel
+%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules} -C kernel || :
+
+%{__make} modules -f Makefile.orig KSRC="kernel/o"
+mkdir -p wct4xxp wctc4xxp wctdm24xxp wcte12xp xpp
+for m in `find -name \*.ko`; do n=${m#./kernel/};mv $m ${n%.ko}-dist.ko; done
 
 check_modules() {
 	err=0
