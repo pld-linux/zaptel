@@ -13,9 +13,13 @@
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
+%bcond_without	xpp		# without Astribank
 
 %ifarch sparc
 %undefine	with_smp
+%endif
+%ifarch alpha
+%undefine	with_xpp
 %endif
 
 %if %{without kernel}
@@ -62,11 +66,15 @@ BuildRequires:	rpmbuild(macros) >= 1.379
 %{?with_bristuff:Provides:	zaptel(bristuff)}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules_1	pciradio,tor2,torisa,wcfxo,wct1xxp,wct4xxp/wct4xxp,
-%define	modules_2	wctdm,wcte11xp,wcusb,zaptel,ztd-eth,ztd-loc,ztdummy,ztdynamic
-%define	modules_3	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,wcte12xp/wcte12xp,zttranscode
-%define	modules_4	xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}
-%define	modules		%{modules_1},%{modules_2},%{modules_3},%{modules_4}
+%define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
+%define	modules_2	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
+%ifnarch alpha
+%define	modules_nalpha	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
+%endif
+%if %{with bristuff}
+%define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
+%endif
+%define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}%{?modules_bristuff:,%{modules_bristuff}}
 
 %if %{without userspace}
 # nothing to be placed to debuginfo package
@@ -267,7 +275,9 @@ fi
 %attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/zaptel.conf
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_libdir}/*.so.*
+%if %{with xpp}
 %{_datadir}/zaptel
+%endif
 %{_mandir}/man8/*
 
 %files init
@@ -288,10 +298,12 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/*
 
+%if %{with xpp}
 %files -n perl-Zaptel
 %defattr(644,root,root,755)
 %{perl_vendorlib}/Zaptel
 %{perl_vendorlib}/Zaptel.pm
+%endif
 %endif
 
 %if %{with kernel}
