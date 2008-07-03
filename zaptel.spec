@@ -25,8 +25,12 @@
 %if "%{_alt_kernel}" != "%{nil}"
 %undefine	with_userspace
 %endif
+%if %{without userspace}
+# nothing to be placed to debuginfo package
+%define		_enable_debug_packages	0
+%endif
 
-%define		rel	5
+%define		rel	6
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
@@ -61,8 +65,7 @@ BuildRequires:	module-init-tools
 BuildRequires:	newt-devel
 BuildRequires:	perl-base
 BuildRequires:	perl-tools-pod
-BuildRequires:	rpmbuild(macros) >= 1.379
-%{?with_bristuff:Provides:	zaptel(bristuff)}
+BuildRequires:	rpmbuild(macros) >= 1.452
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
@@ -74,11 +77,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
 %endif
 %define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}%{?modules_bristuff:,%{modules_bristuff}}
-
-%if %{without userspace}
-# nothing to be placed to debuginfo package
-%define		_enable_debug_packages	0
-%endif
 
 %description
 Zaptel telephony device driver.
@@ -140,13 +138,14 @@ Inicjalizacja Zaptel w czasie startu systemu.
 %package -n kernel%{_alt_kernel}-%{pname}
 Summary:	Zaptel Linux kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
-Release:	%{rel}@%{_kernel_ver_str}
+Release:	%{rel}@%{_kernel_vermagic}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %{?with_dist_kernel:Requires:	kernel%{_alt_kernel}(vermagic) = %{_kernel_ver}}
 %if %{with dist_kernel}
 %{?with_oslec:Requires:	kernel%{_alt_kernel}-misc-oslec(vermagic) = %{_kernel_ver}}
 %endif
+Obsoletes:	kernel%{_alt_kernel}-smp-%{pname}
 
 %description -n kernel%{_alt_kernel}-%{pname}
 Zaptel telephony Linux kernel driver.
