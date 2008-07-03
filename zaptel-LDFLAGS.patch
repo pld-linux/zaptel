@@ -1,0 +1,101 @@
+--- zaptel-1.2.15.orig/Makefile	2007-03-02 23:29:04.000000000 +0100
++++ zaptel-1.2.15/Makefile	2007-03-08 11:22:22.443090250 +0100
+@@ -214,7 +214,7 @@
+ tor2ee.o: tor2-hw.h
+ 
+ tor2ee: tor2ee.o
+-	$(CC) $(CFLAGS) -o $@ $^ -lpci
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lpci
+ 
+ zonedata.lo: zonedata.c
+ 	$(CC) -c $(LCFLAGS) -o $@ $^
+@@ -223,7 +223,7 @@
+ 	$(CC) -c $(LCFLAGS) -o $@ $^
+ 
+ torisatool: torisatool.o
+-	$(CC) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^
+ 
+ tones.h: gendigits
+ 	./gendigits > $@
+@@ -235,7 +235,7 @@
+ 	./makefw pciradio.rbt radfw > radfw.h
+ 
+ gendigits: gendigits.o
+-	$(CC) -o $@ $^ -lm
++	$(CC) $(LDFLAGS) -o $@ $^ -lm
+ 
+ prereq: tones.h tor2fw.h radfw.h version.h
+ 
+@@ -249,16 +249,16 @@
+ 	$(CC) -o $@ -c $^
+ 
+ zttool: zttool.o
+-	$(CC) -o $@ $^ -lnewt
++	$(CC) $(LDFLAGS) -o $@ $^ -lnewt
+ 
+ ztmonitor: ztmonitor.o
+-	$(CC) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^
+ 
+ ztspeed: ztspeed.o
+-	$(CC) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^
+ 
+ sethdlc-new: sethdlc-new.o
+-	$(CC) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^
+ 
+ sethdlc-new.o: sethdlc-new.c
+ 	$(CC) -o $@ -c $(CFLAGS) -I$(KINCLUDES) $^
+@@ -267,18 +267,18 @@
+ 	ar rcs libtonezone.a $^
+ 
+ $(LIBTONEZONE_SO): $(TZOBJS)
+-	$(CC) -shared -Wl,-soname,$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER) -lm -o $@ $^
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,$(LIBTONEZONE_SO).$(LIBTONEZONE_SO_MAJOR_VER).$(LIBTONEZONE_SO_MINOR_VER) -lm -o $@ $^
+ 
+ ztcfg.c: ztcfg.h
+ 
+ ztcfg-shared: ztcfg.o $(LIBTONEZONE_SO)
+-	$(CC) -o $@ $^ -lm
++	$(CC) $(LDFLAGS) -o $@ $^ -lm
+ 
+ ztcfg: ztcfg.o libtonezone.a
+-	$(CC) -o $@ $^ -lm
++	$(CC) $(LDFLAGS) -o $@ $^ -lm
+ 
+ ztcfg-dude: ztcfg-dude.o mknotch.o complex.o $(LIBTONEZONE_SO)
+-	$(CC) -o $@ $^ -lm -lstdc++
++	$(CC) $(LDFLAGS) -o $@ $^ -lm -lstdc++
+ 
+ mknotch.o: mknotch.cc
+ 	$(CC) -o $@ -c $^
+@@ -290,22 +290,22 @@
+ 	$(CC) -o $@ -g -c $^
+ 
+ usbfxstest: usbfxstest.o 
+-	$(CC) -o $@ $^ -lzap
++	$(CC) $(LDFLAGS) -o $@ $^ -lzap
+ 
+ fxstest: fxstest.o $(LIBTONEZONE_SO)
+-	$(CC) -o $@ $^ -lm
++	$(CC) $(LDFLAGS) -o $@ $^ -lm
+ 
+ fxotune: fxotune.o
+-	$(CC) -o $@ $^ -lm
++	$(CC) $(LDFLAGS) -o $@ $^ -lm
+ 
+ fxsdump: fxsdump.o
+-	$(CC) -o $@ $^ -lm
++	$(CC) $(LDFLAGS) -o $@ $^ -lm
+ 
+ stackcheck: checkstack $(BUILDVER)
+ 	./checkstack *.o
+ 
+ ztdiag: ztdiag.o 
+-	$(CC) -o $@ $^
++	$(CC) $(LDFLAGS) -o $@ $^
+ 
+ devices:
+ ifndef DYNFS

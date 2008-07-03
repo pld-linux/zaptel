@@ -1,0 +1,11 @@
+--- zaptel-1.4.8/Makefile~	2008-07-03 17:02:40.000000000 +0300
++++ zaptel-1.4.8/Makefile	2008-07-03 17:10:19.038788404 +0300
+@@ -341,8 +341,6 @@
+ 
+ ztspeed: CFLAGS=
+ 
+-sethdlc-new: CFLAGS+=-I$(KINCLUDES)
+-
+ $(LTZ_A): $(LTZ_A_OBJS)
+ 	ar rcs $@ $^
+ 	ranlib $@
