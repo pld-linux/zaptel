@@ -29,7 +29,7 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
@@ -76,7 +76,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define	modules_1_in	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
 
 %define	modules_2	wct4xxp/ wcte12xp/ %{?with_xpp:xpp/}
-%define	modules_2_in	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_bri,xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
+%define	modules_2_in	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{%{?with_bristuff:xpd_bri,}xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
 %ifnarch alpha
 %define	modules_nalpha	wctc4xxp/ wctdm24xxp/ zttranscode.o
 %define	modules_nalpha_in	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
@@ -227,7 +227,7 @@ check_modules
 %{__make} zttool zttest ztmonitor ztspeed sethdlc-new ztcfg \
 	ztcfg-dude fxstest fxotune ztdiag torisatool \
 	%{?with_bristuff:ztpty} libtonezone.so \
-	CC="%{__cc} %{rpmcflags} -I$(pwd)/kernel" \
+	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
 	KSRC=%{_kernelsrcdir}
 %endif
