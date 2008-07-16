@@ -28877,7 +28877,7 @@ diff -urN zaptel-1.4.11.org/ztpty.c zaptel-1.4.11/ztpty.c
 +#include <sys/signal.h>
 +#include <sys/select.h>
 +#include <math.h>
-+#include "zaptel.h"
++#include "kernel/zaptel.h"
 +
 +#define SIZE 8000
 +
