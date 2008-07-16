@@ -29,7 +29,7 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	0.1
+%define		rel	1
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
@@ -66,15 +66,27 @@ BuildRequires:	rpmbuild(macros) >= 1.379
 %{?with_bristuff:Provides:	zaptel(bristuff)}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
-%define	modules_2	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
+# Rules:
+# - modules_X: single modules, just name module with no suffix
+# - modules_X: subdir modules are just directory name with slash like dirname/
+# - keep X and X_in in sync
+# - X is used for actual building (entries separated with space), X_in for pld macros (entries separated with coma)
+
+%define	modules_1	zaptel.o ztd-eth.o ztd-loc.o pciradio.o tor2.o torisa.o wcfxo.o wct1xxp.o wctdm.o wcte11xp.o wcusb.o ztdummy.o ztdynamic.o
+%define	modules_1_in	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
+
+%define	modules_2	wct4xxp/ wcte12xp/ %{?with_xpp:xpp/}
+%define	modules_2_in	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_bri,xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
 %ifnarch alpha
-%define	modules_nalpha	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
+%define	modules_nalpha	wctc4xxp/ wctdm24xxp/ zttranscode.o
+%define	modules_nalpha_in	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
 %endif
 %if %{with bristuff}
-%define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
+%define	modules_bristuff cwain/ qozap/ vzaphfc/ zaphfc/ ztgsm/ opvxa1200.o wcopenpci.o
+%define	modules_bristuff_in	cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
 %endif
-%define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}%{?modules_bristuff:,%{modules_bristuff}}
+%define	modules		%{modules_1} %{modules_2}%{?modules_nalpha: %{modules_nalpha}}%{?modules_bristuff: %{modules_bristuff}}
+%define	modules_in	%{modules_1_in},%{modules_2_in}%{?modules_nalpha:,%{modules_nalpha_in}}%{?modules_bristuff:,%{modules_bristuff_in}}
 
 %if %{without userspace}
 # nothing to be placed to debuginfo package
@@ -196,15 +208,11 @@ chmod a+rx download-logger
 	OPTFLAGS="%{rpmcflags}"
 
 %if %{with kernel}
-%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules} -C kernel || :
-
-%{__make} modules -f Makefile.orig KSRC="kernel/o"
-mkdir -p wct4xxp wctc4xxp wctdm24xxp wcte12xp xpp
-for m in `find -name \*.ko`; do n=${m#./kernel/};mv $m ${n%.ko}-dist.ko; done
+%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} KBUILD_OBJ_M="%{modules}" -m %{modules_in} -C kernel
 
 check_modules() {
 	err=0
-	for a in {*/,}*.ko; do
+	for a in kernel/{*/,}*.ko; do
 		[[ $a = *-dist.ko ]] && continue
 		echo >&2 "unpackaged module: ${a%.ko}"
 		err=1
@@ -219,7 +227,7 @@ check_modules
 %{__make} zttool zttest ztmonitor ztspeed sethdlc-new ztcfg \
 	ztcfg-dude fxstest fxotune ztdiag torisatool \
 	%{?with_bristuff:ztpty} libtonezone.so \
-	CC="%{__cc} %{rpmcflags}" \
+	CC="%{__cc} %{rpmcflags} -I$(pwd)/kernel" \
 	LDFLAGS="%{rpmldflags}" \
 	KSRC=%{_kernelsrcdir}
 %endif
@@ -228,7 +236,9 @@ check_modules
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
-%install_kernel_modules -m %{modules} -d misc
+cd kernel
+%install_kernel_modules -m %{modules_in} -d misc
+cd ..
 %endif
 
 %if %{with userspace}
