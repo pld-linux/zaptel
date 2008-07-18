@@ -36,7 +36,7 @@ Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
 Version:	1.4.11
-Release:	%{rel}
+Release:	%{rel}%{?with_bristuff:.bristuff}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
