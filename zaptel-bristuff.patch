@@ -2502,7 +2502,7 @@ diff -urN zaptel-1.4.11.org/kernel/cwain/Kbuild zaptel-1.4.11/kernel/cwain/Kbuil
 +
 +FIRM_DIR	:= ../../firmware
 +
-+EXTRA_CFLAGS := -I$(src)/.. -Wno-undef -DLINUX26=1
++EXTRA_CFLAGS := -I$(src)/.. -Wno-undef
 +
 +ifeq ($(HOTPLUG_FIRMWARE),yes)
 +  EXTRA_CFLAGS+=-DHOTPLUG_FIRMWARE
@@ -7562,7 +7562,7 @@ diff -urN zaptel-1.4.11.org/kernel/qozap/Kbuild zaptel-1.4.11/kernel/qozap/Kbuil
 +
 +FIRM_DIR	:= ../../firmware
 +
-+EXTRA_CFLAGS := -I$(src)/.. -Wno-undef -DLINUX26=1
++EXTRA_CFLAGS := -I$(src)/.. -Wno-undef
 +
 +ifeq ($(HOTPLUG_FIRMWARE),yes)
 +  EXTRA_CFLAGS+=-DHOTPLUG_FIRMWARE
@@ -10736,7 +10736,7 @@ diff -urN zaptel-1.4.11.org/kernel/vzaphfc/Kbuild zaptel-1.4.11/kernel/vzaphfc/K
 +
 +FIRM_DIR	:= ../../firmware
 +
-+EXTRA_CFLAGS := -I$(src)/.. -Wno-undef -DLINUX26
++EXTRA_CFLAGS := -I$(src)/.. -Wno-undef
 +
 +ifeq ($(HOTPLUG_FIRMWARE),yes)
 +  EXTRA_CFLAGS+=-DHOTPLUG_FIRMWARE
@@ -15201,7 +15201,7 @@ diff -urN zaptel-1.4.11.org/kernel/zaphfc/Kbuild zaptel-1.4.11/kernel/zaphfc/Kbu
 +
 +FIRM_DIR	:= ../../firmware
 +
-+EXTRA_CFLAGS := -I$(src)/.. -Wno-undef -DLINUX26=1
++EXTRA_CFLAGS := -I$(src)/.. -Wno-undef
 +
 +ifeq ($(HOTPLUG_FIRMWARE),yes)
 +  EXTRA_CFLAGS+=-DHOTPLUG_FIRMWARE
@@ -27180,11 +27180,11 @@ diff -urN zaptel-1.4.11.org/kernel/ztgsm/Kbuild zaptel-1.4.11/kernel/ztgsm/Kbuil
 +
 +FIRM_DIR	:= ../../firmware
 +
-+EXTRA_CFLAGS := -I$(src)/.. -Wno-undef -DLINUX26=1
++EXTRA_CFLAGS := -I$(src)/.. -Wno-undef -DSTANDALONE_ZAPATA -DBUILDING_TONEZONE -DHOTPLUG_FIRMWARE
 +
-+ifeq ($(HOTPLUG_FIRMWARE),yes)
-+  EXTRA_CFLAGS+=-DHOTPLUG_FIRMWARE
-+endif
++
++
++
 diff -urN zaptel-1.4.11.org/kernel/ztgsm/Makefile zaptel-1.4.11/kernel/ztgsm/Makefile
 --- zaptel-1.4.11.org/kernel/ztgsm/Makefile	1970-01-01 01:00:00.000000000 +0100
 +++ zaptel-1.4.11/kernel/ztgsm/Makefile	2008-07-16 22:06:17.257813844 +0200
