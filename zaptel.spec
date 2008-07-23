@@ -14,6 +14,7 @@
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
 %bcond_without	xpp		# without Astribank
+%bcond_with	verbose
 
 %ifarch sparc
 %undefine	with_smp
