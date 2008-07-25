@@ -30,7 +30,7 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	3
+%define		rel	4
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
