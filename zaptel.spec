@@ -30,18 +30,18 @@
 %undefine	with_userspace
 %endif
 
-%define		rel	7
+%define		rel	1
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
-Version:	1.4.11
+Version:	1.4.12.1
 Release:	%{rel}%{?with_bristuff:.bristuff}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
-# Source0-md5:	894d548d180fddf360de1c0426a68bac
+# Source0-md5:	71e83a020b020fa60905edecf70e95a3
 Source1:	%{pname}.init
 Source2:	%{pname}.sysconfig
 Source3:	%{FIRMWARE_URL}/zaptel-fw-oct6114-064-1.05.01.tar.gz
