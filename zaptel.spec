@@ -187,7 +187,7 @@ Perlowy interfejs do Zaptela.
 %{?with_oslec:%patch2 -p1}
 %{?with_bristuff:%patch3 -p1}
 %patch4 -p1
-%patch5 -p1
+%patch5 -p2
 
 %if %{with kernel}
 for a in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6}; do
