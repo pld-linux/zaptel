@@ -59,6 +59,7 @@ Source6:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR6.12.tar.gz
 Patch0:		%{pname}-make.patch
 Patch1:		%{pname}-oslec.patch
 Patch2:		%{pname}-bristuff.patch
+Patch3:		%{pname}-sparc.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel%{_alt_kernel}-module-build
@@ -185,6 +186,7 @@ Perlowy interfejs do Zaptela.
 %patch0 -p1
 %{?with_oslec:%patch1 -p1}
 %{?with_bristuff:%patch2 -p1}
+%patch3 -p1
 
 %if %{with kernel}
 for a in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6}; do
