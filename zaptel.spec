@@ -59,7 +59,7 @@ Patch3:		%{pname}-bristuff.patch
 Patch4:		%{pname}-llh.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
-BuildRequires:	kernel-module-build
+BuildRequires:	kernel%{_alt_kernel}-module-build
 BuildRequires:	module-init-tools
 %endif
 BuildRequires:	newt-devel
