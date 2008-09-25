@@ -29,6 +29,10 @@
 %if "%{_alt_kernel}" != "%{nil}"
 %undefine	with_userspace
 %endif
+%if %{without userspace}
+# nothing to be placed to debuginfo package
+%define		_enable_debug_packages	0
+%endif
 
 %define		rel	1
 %define		pname	zaptel
@@ -88,11 +92,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %endif
 %define	modules		%{modules_1} %{modules_2}%{?modules_nalpha: %{modules_nalpha}}%{?modules_bristuff: %{modules_bristuff}}
 %define	modules_in	%{modules_1_in},%{modules_2_in}%{?modules_nalpha:,%{modules_nalpha_in}}%{?modules_bristuff:,%{modules_bristuff_in}}
-
-%if %{without userspace}
-# nothing to be placed to debuginfo package
-%define		_enable_debug_packages	0
-%endif
 
 %description
 Zaptel telephony device driver.
