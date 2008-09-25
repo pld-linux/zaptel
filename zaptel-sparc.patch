@@ -1,0 +1,14 @@
+--- /home/users/builder2/rpm/BUILD/zaptel-1.4.12.1/kernel/pciradio.c	2008-09-25 22:47:18.761322372 +0000
++++ /home/users/builder2/rpm/BUILD/zaptel-1.4.12.1/kernel/pciradio.c.new	2008-09-25 22:47:15.145487408 +0000
+@@ -52,6 +52,11 @@
+ #include <asm/io.h>
+ #include <asm/delay.h> 
+ 
++#include <linux/version.h>
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,18)
++#include <linux/delay.h>
++#endif
++
+ #ifdef STANDALONE_ZAPATA
+ #include "zaptel.h"
+ #else
