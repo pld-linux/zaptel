@@ -215,6 +215,8 @@ check_modules() {
 	err=0
 	for a in kernel/{*/,}*.ko; do
 		[[ $a = *-dist.ko ]] && continue
+		[[ $a = *-up.ko ]] && continue
+		[[ $a = *-smp.ko ]] && continue
 		echo >&2 "unpackaged module: ${a%.ko}"
 		err=1
 	done
