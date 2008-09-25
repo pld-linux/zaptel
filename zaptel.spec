@@ -75,7 +75,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # - modules_X: single modules, just name module with no suffix
 # - modules_X: subdir modules are just directory name with slash like dirname/
 # - keep X and X_in in sync
-# - X is used for actual building (entries separated with space), X_in for pld macros (entries separated with coma)
+# - X is used for actual building (entries separated with space), X_in for pld macros (entries separated with comma)
 
 %define	modules_1	zaptel.o ztd-eth.o ztd-loc.o pciradio.o tor2.o torisa.o wcfxo.o wct1xxp.o wctdm.o wcte11xp.o wcusb.o ztdummy.o ztdynamic.o
 %define	modules_1_in	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
