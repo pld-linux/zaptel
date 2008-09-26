@@ -203,11 +203,15 @@ chmod a+rx download-logger
 %endif
 
 %build
-%configure
-%{__make} prereq zttest \
-	CC="%{__cc}" \
-	LDFLAGS="%{rpmldflags}" \
-	OPTFLAGS="%{rpmcflags}"
+if [ ! -f configure.stamp ]; then
+	rm -f configure.stamp
+	%configure
+	%{__make} prereq zttest \
+		CC="%{__cc}" \
+		LDFLAGS="%{rpmldflags}" \
+		OPTFLAGS="%{rpmcflags}"
+	touch configure.stamp
+fi
 
 %if %{with kernel}
 %build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} KBUILD_OBJ_M="%{modules}" -m %{modules_in} -C kernel
