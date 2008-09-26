@@ -71,11 +71,16 @@ BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.452
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
-%define	modules_2	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
+%ifnarch sparc
+# this isn't built
+%define	modules_nsparc	,xpp_usb
+%endif
 %ifnarch alpha
 %define	modules_nalpha	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
 %endif
+
+%define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
+%define	modules_2	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp%{?modules_nsparc}
 %if %{with bristuff}
 %define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
 %endif
