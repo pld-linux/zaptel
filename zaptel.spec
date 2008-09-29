@@ -17,9 +17,6 @@
 %ifarch sparc
 %undefine	with_smp
 %endif
-%ifarch alpha
-%undefine	with_xpp
-%endif
 
 %if %{without kernel}
 %undefine	with_dist_kernel
@@ -32,7 +29,7 @@
 %define		_enable_debug_packages	0
 %endif
 
-%define		rel	7
+%define		rel	8
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
@@ -75,16 +72,14 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # this isn't built
 %define	modules_nsparc	,xpp_usb
 %endif
-%ifnarch alpha
-%define	modules_nalpha	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
-%endif
 
 %define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
 %define	modules_2	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp%{?modules_nsparc}}}
+%define	modules_3	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
 %if %{with bristuff}
 %define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
 %endif
-%define	modules		%{modules_1},%{modules_2}%{?modules_nalpha:,%{modules_nalpha}}%{?modules_bristuff:,%{modules_bristuff}}
+%define	modules		%{modules_1},%{modules_2},%{modules_3}%{?modules_bristuff:,%{modules_bristuff}}
 
 %description
 Zaptel telephony device driver.
