@@ -1,5 +1,7 @@
 #
 # TODO:
+# - IMPORTANT rename: http://www.asterisk.org/zaptel-to-dahdi
+#
 # - kernel modules doesn't build
 # - should more header files be installed?
 # - Installed (but unpackaged) file(s) found:
