@@ -36,7 +36,7 @@
 %define		_enable_debug_packages	0
 %endif
 
-%define		rel	17
+%define		rel	18
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
@@ -62,6 +62,7 @@ Patch0:		%{pname}-make.patch
 Patch1:		%{pname}-oslec.patch
 Patch2:		%{pname}-bristuff.patch
 Patch3:		%{pname}-sparc.patch
+Patch4:		%{pname}-kernel.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel%{_alt_kernel}-module-build
@@ -189,6 +190,7 @@ Perlowy interfejs do Zaptela.
 %{?with_oslec:%patch1 -p1}
 %{?with_bristuff:%patch2 -p1}
 %patch3 -p1
+%patch4 -p1
 
 %if %{with kernel}
 for a in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6}; do
