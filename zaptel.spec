@@ -36,7 +36,7 @@
 %define		_enable_debug_packages	0
 %endif
 
-%define		rel	27
+%define		rel	28
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
@@ -73,6 +73,7 @@ BuildRequires:	perl-base
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.379
 %{?with_bristuff:Provides:	zaptel(bristuff)}
+Conflicts:	dahdi-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # Rules:
