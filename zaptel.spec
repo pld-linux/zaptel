@@ -36,7 +36,7 @@
 %define		_enable_debug_packages	0
 %endif
 
-%define		rel	28
+%define		rel	29
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
