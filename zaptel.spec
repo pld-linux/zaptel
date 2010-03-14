@@ -1,5 +1,5 @@
-# TODO:
-# Installed (but unpackaged) file(s) found:
+#
+# - Installed (but unpackaged) file(s) found:
 #   /etc/hotplug/usb/xpp_fxloader
 #   /etc/hotplug/usb/xpp_fxloader.usermap
 #   /etc/udev/rules.d/xpp.rules
@@ -7,15 +7,19 @@
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	kernel		# don't build kernel modules
-%bcond_without	up		# don't build UP module
-%bcond_without	smp		# don't build SMP module
+%bcond_without  up              # don't build UP module
+%bcond_without  smp             # don't build SMP module
 %bcond_without	userspace	# don't build userspace tools
 %bcond_with	oslec		# with Open Source Line Echo Canceller
 %bcond_with	bristuff	# with bristuff support
 %bcond_without	xpp		# without Astribank
+%bcond_with	verbose
 
 %ifarch sparc
 %undefine	with_smp
+%endif
+%ifarch alpha
+%undefine	with_xpp
 %endif
 
 %if %{without kernel}
@@ -29,18 +33,18 @@
 %define		_enable_debug_packages	0
 %endif
 
-%define		rel	8
+%define		rel	33
 %define		pname	zaptel
 %define		FIRMWARE_URL http://downloads.digium.com/pub/telephony/firmware/releases
 Summary:	Zaptel telephony device support
 Summary(pl.UTF-8):	Obsługa urządzeń telefonicznych Zaptel
 Name:		%{pname}%{_alt_kernel}
-Version:	1.4.8
-Release:	%{rel}
+Version:	1.4.12.1
+Release:	%{rel}%{?with_bristuff:.bristuff}
 License:	GPL
 Group:		Base/Kernel
 Source0:	http://ftp.digium.com/pub/zaptel/releases/%{pname}-%{version}.tar.gz
-# Source0-md5:	f57e1ba86a3dd4ef141ca3831e11c076
+# Source0-md5:	71e83a020b020fa60905edecf70e95a3
 Source1:	%{pname}.init
 Source2:	%{pname}.sysconfig
 Source3:	%{FIRMWARE_URL}/zaptel-fw-oct6114-064-1.05.01.tar.gz
@@ -52,11 +56,10 @@ Source5:	%{FIRMWARE_URL}/zaptel-fw-vpmadt032-1.07.tar.gz
 Source6:	%{FIRMWARE_URL}/zaptel-fw-tc400m-MR6.12.tar.gz
 # Source6-md5:	c57f41fae88f129e14fcaf41e4df90dc
 Patch0:		%{pname}-make.patch
-Patch1:		%{pname}-sangoma.patch
-Patch2:		%{pname}-oslec.patch
-Patch3:		%{pname}-bristuff.patch
-Patch4:		%{pname}-llh.patch
-Patch5:		%{pname}-sparc.patch
+Patch1:		%{pname}-oslec.patch
+Patch2:		%{pname}-bristuff.patch
+Patch3:		%{pname}-sparc.patch
+Patch4:		%{pname}-kernel.patch
 URL:		http://www.asterisk.org/
 %if %{with kernel} && %{with dist_kernel}
 BuildRequires:	kernel%{_alt_kernel}-module-build
@@ -65,21 +68,32 @@ BuildRequires:	module-init-tools
 BuildRequires:	newt-devel
 BuildRequires:	perl-base
 BuildRequires:	perl-tools-pod
-BuildRequires:	rpmbuild(macros) >= 1.452
+BuildRequires:	rpmbuild(macros) >= 1.379
+%{?with_bristuff:Provides:	zaptel(bristuff)}
+Conflicts:	dahdi-tools
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%ifnarch sparc
-# this isn't built
-%define	modules_nsparc	,xpp_usb
-%endif
+# Rules:
+# - modules_X: single modules, just name module with no suffix
+# - modules_X: subdir modules are just directory name with slash like dirname/
+# - keep X and X_in in sync
+# - X is used for actual building (entries separated with space), X_in for pld macros (entries separated with comma)
 
-%define	modules_1	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
-%define	modules_2	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{xpd_fxo,xpd_fxs,xpd_pri,xpp%{?modules_nsparc}}}
-%define	modules_3	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
-%if %{with bristuff}
-%define	modules_bristuff cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
+%define	modules_1	zaptel.o ztd-eth.o ztd-loc.o pciradio.o tor2.o torisa.o wcfxo.o wct1xxp.o wctdm.o wcte11xp.o wcusb.o ztdummy.o ztdynamic.o
+%define	modules_1_in	zaptel,ztd-eth,ztd-loc,pciradio,tor2,torisa,wcfxo,wct1xxp,wctdm,wcte11xp,wcusb,ztdummy,ztdynamic
+
+%define	modules_2	wct4xxp/ wcte12xp/ %{?with_xpp:xpp/}
+%define	modules_2_in	wct4xxp/wct4xxp,wcte12xp/wcte12xp%{?with_xpp:,xpp/{%{?with_bristuff:xpd_bri,}xpd_fxo,xpd_fxs,xpd_pri,xpp,xpp_usb}}
+%ifnarch alpha
+%define	modules_nalpha	wctc4xxp/ wctdm24xxp/ zttranscode.o
+%define	modules_nalpha_in	wctc4xxp/wctc4xxp,wctdm24xxp/wctdm24xxp,zttranscode
 %endif
-%define	modules		%{modules_1},%{modules_2},%{modules_3}%{?modules_bristuff:,%{modules_bristuff}}
+%if %{with bristuff}
+%define	modules_bristuff cwain/ qozap/ vzaphfc/ zaphfc/ ztgsm/ opvxa1200.o wcopenpci.o
+%define	modules_bristuff_in	cwain/cwain,qozap/qozap,vzaphfc/vzaphfc,zaphfc/zaphfc,ztgsm/ztgsm,opvxa1200,wcopenpci
+%endif
+%define	modules		%{modules_1} %{modules_2}%{?modules_nalpha: %{modules_nalpha}}%{?modules_bristuff: %{modules_bristuff}}
+%define	modules_in	%{modules_1_in},%{modules_2_in}%{?modules_nalpha:,%{modules_nalpha_in}}%{?modules_bristuff:,%{modules_bristuff_in}}
 
 %description
 Zaptel telephony device driver.
@@ -141,12 +155,13 @@ Inicjalizacja Zaptel w czasie startu systemu.
 %package -n kernel%{_alt_kernel}-%{pname}
 Summary:	Zaptel Linux kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa
-Release:	%{rel}@%{_kernel_vermagic}
+Release:	%{rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
-%{?with_dist_kernel:Requires:	kernel%{_alt_kernel}(vermagic) = %{_kernel_ver}}
 %if %{with dist_kernel}
-%{?with_oslec:Requires:	kernel%{_alt_kernel}-misc-oslec(vermagic) = %{_kernel_ver}}
+%requires_releq_kernel
+Requires(postun):	%releq_kernel
+%{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
 %description -n kernel%{_alt_kernel}-%{pname}
@@ -156,11 +171,15 @@ Zaptel telephony Linux kernel driver.
 Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 
 %package -n kernel%{_alt_kernel}-smp-%{pname}
-Summary:	Zaptel Linux SMP kernel driver
+Summary:        Zaptel Linux SMP kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa SMP
-Group:		Base/Kernel
-%{?with_dist_kernel:Requires:	kernel%{_alt_kernel}-smp(vermagic) = %{_kernel_ver}}
+Group:          Base/Kernel
 Requires(post,postun):	/sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel
+Requires(postun):	%releq_kernel
+%{?with_oslec:Requires:	kernel-smp-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
+%endif
 
 %description -n kernel%{_alt_kernel}-smp-%{pname}
 Zaptel telephony Linux SMP kernel driver.
@@ -183,11 +202,10 @@ Perlowy interfejs do Zaptela.
 %prep
 %setup -q -n %{pname}-%{version}
 %patch0 -p1
-%patch1 -p1
-%{?with_oslec:%patch2 -p1}
-%{?with_bristuff:%patch3 -p1}
+%{?with_oslec:%patch1 -p1}
+%{?with_bristuff:%patch2 -p1}
+%patch3 -p1
 %patch4 -p1
-%patch5 -p2
 
 %if %{with kernel}
 for a in %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6}; do
@@ -204,18 +222,22 @@ chmod a+rx download-logger
 %endif
 
 %build
-%configure
-%{__make} prereq zttest \
-	CC="%{__cc}" \
-	LDFLAGS="%{rpmldflags}" \
-	OPTFLAGS="%{rpmcflags}"
+if [ ! -f configure.stamp ]; then
+	rm -f configure.stamp
+	%configure
+	%{__make} prereq zttest \
+		CC="%{__cc}" \
+		LDFLAGS="%{rpmldflags}" \
+		OPTFLAGS="%{rpmcflags}"
+	touch configure.stamp
+fi
 
 %if %{with kernel}
-%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} -m %{modules}
+%build_kernel_modules SUBDIRS=$PWD DOWNLOAD=$PWD/download-logger ZAP="-I$PWD" KSRC=%{_kernelsrcdir} KBUILD_OBJ_M="%{modules}" -m %{modules_in} -C kernel
 
 check_modules() {
 	err=0
-	for a in {*/,}*.ko; do
+	for a in kernel/{*/,}*.ko; do
 		[[ $a = *-dist.ko ]] && continue
 		[[ $a = *-up.ko ]] && continue
 		[[ $a = *-smp.ko ]] && continue
@@ -229,8 +251,9 @@ check_modules
 %endif
 
 %if %{with userspace}
-%{__make} ztcfg torisatool makefw ztmonitor ztspeed %{?with_bristuff:ztpty} libtonezone.so \
-	fxstest fxotune \
+%{__make} zttool zttest ztmonitor ztspeed sethdlc-new ztcfg \
+	ztcfg-dude fxstest fxotune ztdiag torisatool \
+	%{?with_bristuff:ztpty} libtonezone.so \
 	CC="%{__cc} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
 	KSRC=%{_kernelsrcdir}
@@ -240,7 +263,9 @@ check_modules
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
-%install_kernel_modules -m %{modules} -d misc
+cd kernel
+%install_kernel_modules -m %{modules_in} -d misc
+cd ..
 %endif
 
 %if %{with userspace}
@@ -253,12 +278,12 @@ install -d $RPM_BUILD_ROOT{/sbin,%{_includedir}/linux,/etc/{rc.d/init.d,sysconfi
 	MODCONF=$RPM_BUILD_ROOT/etc/modprobe.conf \
 	KSRC=%{_kernelsrcdir} \
 	PERLLIBDIR=%{perl_vendorlib}
-install zttest torisatool makefw ztmonitor ztspeed fxstest fxotune %{?with_bristuff:ztpty} $RPM_BUILD_ROOT%{_sbindir}
+install zttool zttest ztmonitor ztspeed sethdlc-new ztcfg ztcfg-dude fxstest fxotune ztdiag torisatool %{?with_bristuff:ztpty} $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/zaptel
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/zaptel
 touch $RPM_BUILD_ROOT/etc/zaptel.conf
 
-install zconfig.h ecdis.h fasthdlc.h biquad.h $RPM_BUILD_ROOT/usr/include/zaptel/
+install kernel/{zconfig.h,ecdis.h,fasthdlc.h,biquad.h} $RPM_BUILD_ROOT/usr/include/zaptel/
 %endif
 
 %clean
