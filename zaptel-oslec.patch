@@ -1,32 +1,13 @@
-diff -ruN zaptel-1.4.9.2-orig/kernel/oslec.h zaptel-1.4.9.2/kernel/oslec.h
---- zaptel-1.4.9.2-orig/kernel/oslec.h	1970-01-01 09:30:00.000000000 +0930
-+++ zaptel-1.4.9.2/kernel/oslec.h	2008-03-05 20:25:15.617592152 +1030
-@@ -0,0 +1,45 @@
+diff -Nur zaptel-1.4.3.org/oslec.h zaptel-1.4.3/oslec.h
+--- zaptel-1.4.3.org/oslec.h	1970-01-01 00:00:00.000000000 +0000
++++ zaptel-1.4.3/oslec.h	2007-07-01 15:25:59.376524352 +0000
+@@ -0,0 +1,29 @@
 +/*
 +  oslec.h
 +  David Rowe
 +  7 Feb 2007
 +
 +  Interface for OSLEC module.
-+*/
-+
-+/*
-+  Copyright (C) 2007 David Rowe
-+ 
-+  All rights reserved.
-+ 
-+  This program is free software; you can redistribute it and/or modify
-+  it under the terms of the GNU General Public License version 2, as
-+  published by the Free Software Foundation.
-+ 
-+  This program is distributed in the hope that it will be useful,
-+  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+  GNU General Public License for more details.
-+ 
-+  You should have received a copy of the GNU General Public License
-+  along with this program; if not, write to the Free Software
-+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 +*/
 +
 +#ifndef __OSLEC__
@@ -40,56 +21,56 @@ diff -ruN zaptel-1.4.9.2-orig/kernel/oslec.h zaptel-1.4.9.2/kernel/oslec.h
 +void oslec_echo_can_free(struct echo_can_state *ec);
 +short oslec_echo_can_update(struct echo_can_state *ec, short iref, short isig);
 +int oslec_echo_can_traintap(struct echo_can_state *ec, int pos, short val);
-+void oslec_echo_can_identify(char *buf, size_t len);
-+static inline void echo_can_init(void) { printk("Zaptel Echo Canceller: OSLEC\n"); }
++static inline void echo_can_init(void) {}
 +static inline void echo_can_shutdown(void) {}
 +short oslec_hpf_tx(struct echo_can_state *ec, short txlin);
++static inline void echo_can_identify(char *buf, size_t len)
++{
++	strncpy(buf, "OSLEC", len);
++}
 +
 +#endif
 +
-diff -ruN zaptel-1.4.9.2-orig/kernel/zaptel-base.c zaptel-1.4.9.2/kernel/zaptel-base.c
---- zaptel-1.4.9.2-orig/kernel/zaptel-base.c	2008-02-29 05:30:47.000000000 +1030
-+++ zaptel-1.4.9.2/kernel/zaptel-base.c	2008-03-05 20:25:15.642588352 +1030
-@@ -421,10 +421,35 @@
- #include "kb1ec.h"
- #elif defined(ECHO_CAN_MG2)
+diff -Nur zaptel-1.4.3.org/version.h zaptel-1.4.3/version.h
+--- zaptel-1.4.3.org/version.h	1970-01-01 00:00:00.000000000 +0000
++++ zaptel-1.4.3/version.h	2007-07-01 15:25:59.376524352 +0000
+@@ -0,0 +1,6 @@
++/*
++ * version.h 
++ * Automatically generated
++ */
++#define ZAPTEL_VERSION "1.4.1"
++
+diff -Nur zaptel-1.4.3.org/zaptel-base.c zaptel-1.4.3/zaptel-base.c
+--- zaptel-1.4.3.org/zaptel-base.c	2007-07-01 15:25:19.914823416 +0000
++++ zaptel-1.4.3/zaptel-base.c	2007-07-01 15:24:53.000000000 +0000
+@@ -426,6 +426,14 @@
  #include "mg2ec.h"
+ #elif defined(ECHO_CAN_JP1)
+ #include "jpah.h"
 +/* Start Open Source Line Echo Canceller (OSLEC) -----------------*/
 +#elif defined(ECHO_CAN_OSLEC)
 +#include "oslec.h"
-+#define echo_can_create_noparams oslec_echo_can_create
++#define echo_can_create oslec_echo_can_create
 +#define echo_can_free oslec_echo_can_free
 +#define echo_can_update oslec_echo_can_update
 +#define echo_can_traintap oslec_echo_can_traintap
-+#define echo_can_identify oslec_echo_can_identify
-+#define ECHO_CAN_NO_PARAMS
 +/* End Open Source Line Echo Canceller (OSLEC) -------------------*/
- #elif defined(ECHO_CAN_JP1)
- #include "jpah.h"
+ #else
+ #include "mec3.h"
  #endif
- 
-+#ifdef ECHO_CAN_NO_PARAMS
-+/* A wrapper to the original echo can interface, with no parameters */
-+static int echo_can_create(struct zt_echocanparams *ecp, struct zt_echocanparam *p,
-+			   struct echo_can_state **ec)
-+{
-+	/* ignore the parameters */
-+	/* TODO: maybe fail if the user passes us parameters? or at
-+	 * least list their number? */
-+	*ec = echo_can_create_noparams(ecp->tap_length, 0);
-+	if (!ec)
-+		return -EINVAL; /* an arbitrary error */
-+	return 0;
-+}
-+#endif
+@@ -4985,6 +4993,7 @@
+ 		}
+ 	}
+ #endif
 +
- static inline void rotate_sums(void)
- {
- 	/* Rotate where we sum and so forth */
-@@ -5955,6 +5980,70 @@
+ 	if ((!ms->confmute && !ms->dialing) || (ms->flags & ZT_FLAG_PSEUDO)) {
+ 		/* Handle conferencing on non-clear channel and non-HDLC channels */
+ 		switch(ms->confmode & ZT_CONF_MODE_MASK) {
+@@ -5751,6 +5760,69 @@
+ 	chan->rxsig = cursig;
  	spin_unlock_irqrestore(&chan->lock, flags);
  }
- 
 +/* Zaptap code -----------------------------------------------------------*/
 +
 +#define SAMPLE_BUF_SZ  1000 
@@ -140,12 +121,12 @@ diff -ruN zaptel-1.4.9.2-orig/kernel/zaptel-base.c zaptel-1.4.9.2/kernel/zaptel-
 +      samples = 0;
 +
 +      if (sample_state == SAMPLE_PING) {
-+	sample_state = SAMPLE_PONG;
-+	psample = pong;
++       sample_state = SAMPLE_PONG;
++       psample = pong;
 +      }
 +      else {
-+	sample_state = SAMPLE_PING;
-+	psample = ping;
++       sample_state = SAMPLE_PING;
++       psample = ping;
 +      }
 +      wake_up_interruptible(&sample_wait);
 +    }
@@ -153,130 +134,96 @@ diff -ruN zaptel-1.4.9.2-orig/kernel/zaptel-base.c zaptel-1.4.9.2/kernel/zaptel-
 +}
 +
 +/* end Zaptap code -----------------------------------------------------*/
-+
+ 
  static inline void __zt_ec_chunk(struct zt_chan *ss, unsigned char *rxchunk, const unsigned char *txchunk)
  {
- 	short rxlin, txlin;
-@@ -6005,7 +6094,9 @@
+@@ -5802,7 +5874,9 @@
  #if !defined(ZT_EC_ARRAY_UPDATE)
  			for (x=0;x<ZT_CHUNKSIZE;x++) {
  				rxlin = ZT_XLAW(rxchunk[x], ss);
 +				sample_echo_before(ss->channo, rxlin, ZT_XLAW(txchunk[x], ss)); /* Zaptap code */
  				rxlin = echo_can_update(ss->ec, ZT_XLAW(txchunk[x], ss), rxlin);
-+				sample_echo_after(ss->channo, rxlin);                           /* Zaptap code */
++                                sample_echo_after(ss->channo, rxlin);                           /* Zaptap code */
  				rxchunk[x] = ZT_LIN2X((int) rxlin, ss);
  			}
  #else /* defined(ZT_EC_ARRAY_UPDATE) */
-@@ -6887,6 +6978,8 @@
+@@ -6680,6 +6754,8 @@
  static void __zt_transmit_chunk(struct zt_chan *chan, unsigned char *buf)
  {
  	unsigned char silly[ZT_CHUNKSIZE];
-+	int x;
++	 int x;
 +
  	/* Called with chan->lock locked */
- #ifdef	OPTIMIZE_CHANMUTE
- 	if(likely(chan->chanmute))
-@@ -6905,10 +6998,29 @@
+ 	if (!buf)
+ 		buf = silly;
+@@ -6694,10 +6770,126 @@
  		kernel_fpu_end();
  #endif
  	}
++       /* Start Zaptap code -----------------------------------------*/
 +
-+	/* Start Zaptap code -----------------------------------------*/
++       if (sample_impulse && (samples == 0)) {
 +
-+	if (sample_impulse && (samples == 0)) {
++               // option impulse insertion, tx stream becomes one
++               // impulse followed by SAMPLE_BUF_SZ-1 0's
 +
-+		// option impulse insertion, tx stream becomes one
-+                // impulse followed by SAMPLE_BUF_SZ-1 0's
++               buf[0] = ZT_LIN2MU(10000);
++               for (x=1;x<ZT_CHUNKSIZE;x++) {
++                   buf[x] = ZT_LIN2MU(0);
++               }
++       }
 +
-+		buf[0] = ZT_LIN2MU(10000);
-+		for (x=1;x<ZT_CHUNKSIZE;x++) {
-+		    buf[x] = ZT_LIN2MU(0);
-+		}
-+	}
++       /* End Zaptap code -----------------------------------------*/
 +
-+	/* End Zaptap code -----------------------------------------*/
-+	
- }
- 
- static inline void __zt_real_transmit(struct zt_chan *chan)
- {
-+        short txlin;
-+	int   x;
-+
- 	/* Called with chan->lock held */
- #ifdef	OPTIMIZE_CHANMUTE
- 	if(likely(chan->chanmute))
-@@ -6920,6 +7032,19 @@
- 	} else {
- 		__zt_transmit_chunk(chan, chan->writechunk);
- 	}
-+		
-+        /* return, if no echo canceler have been allocated. */
-+
-+	if (!chan->ec) return;
-+
-+	/* hook to allow HPF filtering of audio leaving tx (D/A) port, this
-+	   inproves performance when using soft phones */
-+
-+	for (x=0;x<ZT_CHUNKSIZE;x++) {
-+	  txlin = ZT_XLAW(chan->writechunk[x], chan);
-+	  txlin = oslec_hpf_tx(chan->ec, txlin);
-+	  chan->writechunk[x] = ZT_LIN2X((int)txlin, chan);
-+	}
- }
- 
- static void __zt_getempty(struct zt_chan *ms, unsigned char *buf)
-@@ -7365,6 +7490,104 @@
- 	return 0;
  }
  
 +/* Zaptap code -----------------------------------------------------*/
 +
 +static int sample_open (struct inode *inode, struct file *file) {
-+	printk("sample_open:\n");
-+	tmp1 = tmp2 = -1;
++       printk("sample_open:\n");
++       tmp1 = tmp2 = -1;
 +
-+	psample = ping;
-+	samples = 0;
-+	sample_state = SAMPLE_PING;
++       psample = ping;
++       samples = 0;
++       sample_state = SAMPLE_PING;
 +
-+	return 0;
++       return 0;
 +}
 +
 +static int sample_release (struct inode *inode, struct file *file) {
-+	printk("sample_release: tmp1 = %d tmp2 = %d\n", tmp1, tmp2);
++       printk("sample_release: tmp1 = %d tmp2 = %d\n", tmp1, tmp2);
 +
-+	sample_state = SAMPLE_IDLE;
-+	sample_impulse = 0;
-+	samples = 0;
++       sample_state = SAMPLE_IDLE;
++       sample_impulse = 0;
++       samples = 0;
 +
-+	return 0;
++       return 0;
 +}
 +
 +static ssize_t sample_read(struct file *file, char *buf,
-+		size_t count, loff_t *ppos) {
-+	int    err, len;
-+	short *pread;
++               size_t count, loff_t *ppos) {
++       int    err, len;
++       short *pread;
 +
-+	/* wait for next buffer to be prepared by ISR, we read
++       /* wait for next buffer to be prepared by ISR, we read
 +           alternate buffer just after transition.
 +         */
-+	interruptible_sleep_on(&sample_wait);
++       interruptible_sleep_on(&sample_wait);
 +
-+	if (sample_state == SAMPLE_PING) {
-+	  pread = pong;
-+	}
-+	else {
-+	  pread = ping;
-+	}
++       if (sample_state == SAMPLE_PING) {
++         pread = pong;
++       }
++       else {
++         pread = ping;
++       }
 +
-+	len = 3*sizeof(short)*SAMPLE_BUF_SZ;
-+	err = copy_to_user(buf, pread, len);
++       len = 3*sizeof(short)*SAMPLE_BUF_SZ;
++       err = copy_to_user(buf, pread, len);
 +
-+	if (err != 0)
-+		return -EFAULT;
++       if (err != 0)
++               return -EFAULT;
 +
-+	return len;
++       return len;
 +}
 +
 +/* ioctls for sample */
@@ -285,42 +232,42 @@ diff -ruN zaptel-1.4.9.2-orig/kernel/zaptel-base.c zaptel-1.4.9.2/kernel/zaptel-
 +#define SAMPLE_TX_IMPULSE  1
 +
 +static int sample_ioctl(struct inode *inode, struct file *file,
-+		unsigned int cmd, unsigned long arg) {
-+	int retval = 0;
++               unsigned int cmd, unsigned long arg) {
++       int retval = 0;
 +
-+	switch ( cmd ) {
-+		case SAMPLE_SET_CHANNEL:
-+		  if (copy_from_user(&sample_ch, (int *)arg, sizeof(int)))
-+		    return -EFAULT;
-+	          printk("sample_ioctl: sample_ch = %d\n", sample_ch);
-+		  break;
-+		case SAMPLE_TX_IMPULSE:
-+		  sample_impulse = 1;
-+		  printk("sample_ioctl: under impulse power\n");
-+		  break;
-+		default:
-+		  retval = -EINVAL;
++       switch ( cmd ) {
++               case SAMPLE_SET_CHANNEL:
++                 if (copy_from_user(&sample_ch, (int *)arg, sizeof(int)))
++                   return -EFAULT;
++                 printk("sample_ioctl: sample_ch = %d\n", sample_ch);
++                 break;
++               case SAMPLE_TX_IMPULSE:
++                 sample_impulse = 1;
++                 printk("sample_ioctl: under impulse power\n");
++                 break;
++               default:
++                 retval = -EINVAL;
 +        }
 +
-+	return retval;
++       return retval;
 +}
 +
 +// define which file operations are supported
 +struct file_operations sample_fops = {
-+	.owner	=	THIS_MODULE,
-+	.llseek	=	NULL,
-+	.read	=	sample_read,
-+	.write	=	NULL,
-+	.readdir=	NULL,
-+	.poll	=	NULL,
-+	.ioctl	=	sample_ioctl,
-+	.mmap	=	NULL,
-+	.open	=	sample_open,
-+	.flush	=	NULL,
-+	.release=	sample_release,
-+	.fsync	=	NULL,
-+	.fasync	=	NULL,
-+	.lock	=	NULL
++       .owner  =       THIS_MODULE,
++       .llseek =       NULL,
++       .read   =       sample_read,
++       .write  =       NULL,
++       .readdir=       NULL,
++       .poll   =       NULL,
++       .ioctl  =       sample_ioctl,
++       .mmap   =       NULL,
++       .open   =       sample_open,
++       .flush  =       NULL,
++       .release=       sample_release,
++       .fsync  =       NULL,
++       .fasync =       NULL,
++       .lock   =       NULL,
 +};
 +
 +#define SAMPLE_NAME  "sample"
@@ -328,25 +275,46 @@ diff -ruN zaptel-1.4.9.2-orig/kernel/zaptel-base.c zaptel-1.4.9.2/kernel/zaptel-
 +
 +/* end Zaptap code -----------------------------------------------------*/
 +
- static int __init zt_init(void) {
- 	int res = 0;
+ static inline void __zt_real_transmit(struct zt_chan *chan)
+ {
++        short txlin;
++	int   x;
++
+ 	/* Called with chan->lock held */
+ 	if (chan->confmode) {
+ 		/* Pull queued data off the conference */
+@@ -6705,6 +6897,15 @@
+ 	} else {
+ 		__zt_transmit_chunk(chan, chan->writechunk);
+ 	}
++
++        // return, if no echo canceler have been allocated.
++	if (!chan->ec) return;
++	/* hook to allow HPF filtering of audio leaving tx (D/A) port */
++	for (x=0;x<ZT_CHUNKSIZE;x++) {
++	  txlin = ZT_XLAW(chan->writechunk[x], chan);
++	  txlin = oslec_hpf_tx(chan->ec, txlin);
++	  chan->writechunk[x] = ZT_LIN2X((int)txlin, chan);
++	}
+ }
  
-@@ -7409,12 +7634,27 @@
+ static void __zt_getempty(struct zt_chan *ms, unsigned char *buf)
+@@ -7171,12 +7372,27 @@
  #ifdef CONFIG_ZAPTEL_WATCHDOG
  	watchdog_init();
  #endif	
 +
-+	/* start Zaptap code ----------------------------------------*/
++       /* start Zaptap code ----------------------------------------*/
 +
-+	sample_state = SAMPLE_IDLE;
-+	sample_impulse = 0;
++       sample_state = SAMPLE_IDLE;
++       sample_impulse = 0;
 +	if ((res = register_chrdev (SAMPLE_MAJOR, SAMPLE_NAME, &sample_fops))) {
 +	  printk(KERN_ERR "Zaptap unable to register 'sample' char driver on %d\n", SAMPLE_MAJOR);
 +	  return res;
 +	}
 +	printk("Zaptap registered 'sample' char driver on major %d\n", SAMPLE_MAJOR);
 +
-+	/* end Zaptap code ------------------------------------------*/
++       /* end Zaptap code ------------------------------------------*/
 +
  	return res;
  }
@@ -354,20 +322,20 @@ diff -ruN zaptel-1.4.9.2-orig/kernel/zaptel-base.c zaptel-1.4.9.2/kernel/zaptel-
  static void __exit zt_cleanup(void) {
  	int x;
  
-+	unregister_chrdev (SAMPLE_MAJOR, SAMPLE_NAME); /* Zaptap code */
++	 unregister_chrdev (SAMPLE_MAJOR, SAMPLE_NAME); /* Zaptap code */
 +
  #ifdef CONFIG_PROC_FS
  	remove_proc_entry("zaptel", NULL);
  #endif
-diff -ruN zaptel-1.4.9.2-orig/kernel/zconfig.h zaptel-1.4.9.2/kernel/zconfig.h
---- zaptel-1.4.9.2-orig/kernel/zconfig.h	2008-02-05 09:30:48.000000000 +1030
-+++ zaptel-1.4.9.2/kernel/zconfig.h	2008-03-05 20:25:15.644588048 +1030
-@@ -65,7 +65,8 @@
- /* #define ECHO_CAN_STEVE2 */
+diff -Nur zaptel-1.4.3.org/zconfig.h zaptel-1.4.3/zconfig.h
+--- zaptel-1.4.3.org/zconfig.h	2007-04-24 18:32:49.000000000 +0000
++++ zaptel-1.4.3/zconfig.h	2007-07-01 15:25:59.380524524 +0000
+@@ -63,7 +63,8 @@
+ /* #define ECHO_CAN_MARK3 */
  /* #define ECHO_CAN_KB1 */
  /* This is the new latest and greatest */
 -#define ECHO_CAN_MG2
-+//#define ECHO_CAN_MG2
++/* #define ECHO_CAN_MG2 */
 +#define ECHO_CAN_OSLEC
  
  /*
