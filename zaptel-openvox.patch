@@ -1,0 +1,117 @@
+diff -uNr zaptel-1.4.12.1.orig/kernel/wcte11xp.c zaptel-1.4.12.1/kernel/wcte11xp.c
+--- zaptel-1.4.12.1.orig/kernel/wcte11xp.c	2008-08-14 00:58:36.000000000 +0000
++++ zaptel-1.4.12.1/kernel/wcte11xp.c	2010-03-22 23:04:54.000000000 +0000
+@@ -9,19 +9,19 @@
+  *
+  * All rights reserved.
+  *
+- */
+-
+-/*
+- * See http://www.asterisk.org for more information about
+- * the Asterisk project. Please do not directly contact
+- * any of the maintainers of this project for assistance;
+- * the project provides a web site, mailing lists and IRC
+- * channels for your use.
+- *
+- * This program is free software, distributed under the terms of
+- * the GNU General Public License Version 2 as published by the
+- * Free Software Foundation. See the LICENSE file included with
+- * this program for more details.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+  */
+ 
+ #include <linux/kernel.h>
+@@ -652,7 +652,7 @@
+ {
+ 	printk("TE110P: Setting up global serial parameters for %s %s\n", 
+ 	       wc->spantype == TYPE_E1 ? (unchannelized ? "Unchannelized E1" : "E1") : "T1", 
+-		   wc->spanflags & FLAG_FALC12 ? "FALC V1.2" : "FALC V2.2");
++		   wc->spanflags & FLAG_FALC12 ? "FALC V1.2" : "FALC V2.1 or V2.2");
+ 	t1_framer_out(wc, 0x85, 0xe0);	/* GPC1: Multiplex mode enabled, FSC is output, active low, RCLK from channel 0 */
+ 	t1_framer_out(wc, 0x08, 0x05);	/* IPC: Interrupt push/pull active low */
+ 	if (wc->spanflags & FLAG_FALC12) {
+@@ -664,14 +664,43 @@
+ 		t1_framer_out(wc, 0x97, 0x10);
+ 	} else {
+ 		/* Global clocks (8.192 Mhz CLK) */
+-		t1_framer_out(wc, 0x92, 0x00);	
+-		t1_framer_out(wc, 0x93, 0x18);
+-		t1_framer_out(wc, 0x94, 0xfb);
+-		t1_framer_out(wc, 0x95, 0x0b);
+-		t1_framer_out(wc, 0x96, 0x00);
+-		t1_framer_out(wc, 0x97, 0x0b);
+-		t1_framer_out(wc, 0x98, 0xdb);
+-		t1_framer_out(wc, 0x99, 0xdf);
++		unsigned char wafer;
++		wafer = (t1_framer_in(wc, 0xec)>>6)&0x03;	/* read wafer register to see it is a 2.1 or 2.2 version; */
++		if ( wafer == 0x00)	/* 2.1 */
++		{
++			printk("Infineon PEF2256 V2.1 found\n");
++			if (wc->spantype == TYPE_E1) {
++				t1_framer_out(wc, 0x92, 0x00);	
++				t1_framer_out(wc, 0x93, 0x00);
++				t1_framer_out(wc, 0x94, 0x00);
++				t1_framer_out(wc, 0x95, 0x00);
++				t1_framer_out(wc, 0x96, 0x00);
++				t1_framer_out(wc, 0x97, 0x0F);
++				t1_framer_out(wc, 0x98, 0x80);
++				t1_framer_out(wc, 0x99, 0x00);
++			} else {	
++				t1_framer_out(wc, 0x92, 0x00);	
++				t1_framer_out(wc, 0x93, 0x10);
++				t1_framer_out(wc, 0x94, 0xfb);
++				t1_framer_out(wc, 0x95, 0x03);
++				t1_framer_out(wc, 0x96, 0x00);
++				t1_framer_out(wc, 0x97, 0x0b);
++				t1_framer_out(wc, 0x98, 0x8c);
++				t1_framer_out(wc, 0x99, 0x80);
++			}
++		}
++		else	/* 2.2 version, wafer should be 0x01 */
++		{
++			printk("Infineon PEF2256 V2.2 found\n");
++			t1_framer_out(wc, 0x92, 0x00);	
++			t1_framer_out(wc, 0x93, 0x18);
++			t1_framer_out(wc, 0x94, 0xfb);
++			t1_framer_out(wc, 0x95, 0x0b);
++			t1_framer_out(wc, 0x96, 0x00);
++			t1_framer_out(wc, 0x97, 0x0b);
++			t1_framer_out(wc, 0x98, 0xdb);
++			t1_framer_out(wc, 0x99, 0xdf);	
++		}
+ 	}
+ 	/* Configure interrupts */	
+ 	t1_framer_out(wc, 0x46, 0x40);	/* GCR: Interrupt on Activation/Deactivation of AIX, LOS */
+@@ -687,6 +716,11 @@
+ 	t1_framer_out(wc, 0x24, 0x07);	/* RC0: Just shy of 255 */
+ 	if (wc->spanflags & FLAG_FALC12)
+ 		t1_framer_out(wc, 0x25, 0x04);	/* RC1: The rest of RC0 */
++	else if ( control_get_reg(wc, WC_VERSION) == 0xa0)	/* openvox D110PG V1 */
++	{
++		printk("OpenVox D110PG V1 found.\n");
++		t1_framer_out(wc, 0x25, 0x04);	/* RC1: The rest of RC0 */
++	}
+ 	else
+ 		t1_framer_out(wc, 0x25, 0x05);	/* RC1: The rest of RC0 */
+ 	
+@@ -973,6 +1007,7 @@
+ 	snprintf(wc->span.desc, sizeof(wc->span.desc) - 1, "%s Card %d", wc->variety, wc->num);
+ 	wc->span.manufacturer = "Digium";
+ 	zap_copy_string(wc->span.devicetype, wc->variety, sizeof(wc->span.devicetype));
++	strncpy(wc->span.devicetype, wc->variety, sizeof(wc->span.devicetype) - 1);
+ 	snprintf(wc->span.location, sizeof(wc->span.location) - 1,
+ 		 "PCI Bus %02d Slot %02d", wc->dev->bus->number, PCI_SLOT(wc->dev->devfn) + 1);
+ 	wc->span.spanconfig = t1xxp_spanconfig;
