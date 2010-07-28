@@ -174,6 +174,7 @@ Sterownik dla jądra Linuksa do urządzeń telefonicznych Zaptel.
 %package -n kernel%{_alt_kernel}-smp-%{pname}
 Summary:        Zaptel Linux SMP kernel driver
 Summary(pl.UTF-8):	Sterownik Zaptel dla jądra Linuksa SMP
+Release:	%{rel}@%{_kernel_ver_str}
 Group:          Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
