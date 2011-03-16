@@ -160,8 +160,8 @@ Release:	%{rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
-%requires_releq_kernel
-Requires(postun):	%releq_kernel
+%requires_releq_kernel_up
+Requires(postun):	%releq_kernel_up
 %{?with_oslec:Requires:	kernel-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
@@ -178,8 +178,8 @@ Release:	%{rel}@%{_kernel_ver_str}
 Group:          Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
-%requires_releq_kernel
-Requires(postun):	%releq_kernel
+%requires_releq_kernel_smp
+Requires(postun):	%releq_kernel_smp
 %{?with_oslec:Requires:	kernel-smp-misc-oslec = 20070608-0.1@%{_kernel_ver_str}}
 %endif
 
